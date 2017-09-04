@@ -704,8 +704,9 @@ export default {
             bmap.addControl(new BMap.MapTypeControl());
             // bmap.mapType=BMAP_SATELLITE_MAP;
             bmap.setMinZoom(5);
-            bmap.setMapType(BMAP_NORMAL_MAP);
-           // bmap.setMapType(BMAP_HYBRID_MAP)
+            //bmap.setMapType(BMAP_NORMAL_MAP);
+            //bmap.mapType=BMAP_SATELLITE_MAP;
+            bmap.setMapType(BMAP_HYBRID_MAP)
             bmap.addEventListener("click",function(e){  
                 //alert(e.point.lng+","+e.point.lat);// 单击地图获取坐标点；
                 var zoom = bmap.getZoom()+1; 

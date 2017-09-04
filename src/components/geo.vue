@@ -55,7 +55,8 @@ export default {
             msg:{
                 show:'',
                 name:'',
-                arr:[]
+                arr:[],
+                from:''
             },
             geoCoordMap: {
 
@@ -96,7 +97,7 @@ export default {
                             }
                         }
                     },
-                    roam: false,
+                    roam: true,
                     width: '100%',
                     height:'100%',
                     itemStyle: {
@@ -176,6 +177,9 @@ export default {
                     return
                 }
             }*/
+            if (param.name== '南海诸岛') {
+                    return ;
+                }
             //alert(param.name);
             if (this.option.geo.map&&this.option.geo.map!=param.name&&param.name!='设备1') {
                 ++this.count;
@@ -199,6 +203,7 @@ export default {
                         this.msg.show='bmap';
                         this.msg.name=param.name;
                         this.msg.arr=this.name;
+                        this.msg.from='geo';
                         //alert(param.name)
                        this.$emit('tellToGeo',this.msg); 
                     }
@@ -212,8 +217,8 @@ export default {
             this.myChart.showLoading();
             this.option.title.text = param.name + "分布图"
             this.option.geo.map = param.name;
-            this.option.geo.width = '70%';
-            this.option.geo.height = '70%';
+            this.option.geo.width = '100%';
+            this.option.geo.height = '100%';
             //this.getMapName(param.name);
             if (param.name == '湖北') {
                 Object.assign(this.option.series[0], {
@@ -262,8 +267,8 @@ export default {
                 var path = this.name[i];
                 this.option.title.text = path + "分布图"
                 this.option.geo.map = path;
-                this.option.geo.width = '70%';
-                this.option.geo.height = '70%';
+                this.option.geo.width = '100%';
+                this.option.geo.height = '100%';
                 this.name.length--;
                 this.getMapName(path);
             }
@@ -346,7 +351,7 @@ export default {
             this.myChart.showLoading();
             
             //this.myChart.setOption(this.option);
-            this.myChart.on("click", this.chartClick);
+            this.myChart.on("dblclick", this.chartClick);
             var node = document.getElementById('returnGeo');
             var node2 = document.getElementById('echarts');
             var that = this;
@@ -363,7 +368,7 @@ export default {
                 this.name=this.setName.map;
                 this.option.geo.map = this.setName.name;
                  this.chartClick(this.setName) 
-                
+                this.setName.name='';
             }else{
                 this.getMapName('china');
                 this.myChart.hideLoading();
