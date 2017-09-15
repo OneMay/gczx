@@ -29,7 +29,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api': {
-                target: 'http://www.apqte.com',
+                target: 'http://59.68.29.89:18081',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': '/api'

@@ -14,6 +14,8 @@ export default {
             data.strSQL = base64encode(data.strSQL);
             //由于使用的form-data传数据所以要格式化
             data = JSON.stringify(data);
+            //data = Qs.stringify(data);
+            //data = '{' + data + '}'
             //console.log(data);
             return data;
         }
@@ -26,7 +28,9 @@ export default {
     ],
 
     headers: {
-        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Accept': 'application/json, text/javascript, */*; q=0.01'
     },
 
     params: {
@@ -38,26 +42,9 @@ export default {
     },
 
     data: {
-        eid: "514403",
-        currentPage: 1,
-        ItemsOfPage: 99999,
-        type: 0,
-        username: '',
-        password: '',
-        name: '',
-        quality: '',
-        technology: '',
-        specifications: '',
-        packing: '',
-        selenium: '',
-        describe: '',
-        page: 1,
-        date: '',
-        hour: '',
-        data: null,
         traceCode: "9693256390009800000000010",
         itemName: "Temperature",
-        measureTime: '',
+        measureTime: null,
         baseNo: "BN001",
         companyNo: 2,
         strSQL: ""

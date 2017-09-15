@@ -16,18 +16,6 @@ export class AXIOS {
         return axios.get(param.api, {}, config);
     }
     post(param) {
-        config.data.username = param.param.username;
-        config.data.password = param.param.password;
-        config.data.name = param.param.name;
-        config.data.quality = param.param.quality;
-        config.data.technology = param.param.technology;
-        config.data.specifications = param.param.specifications;
-        config.data.packing = param.param.packing;
-        config.data.selenium = param.param.selenium;
-        config.data.describe = param.param.describe;
-        config.data.date = param.param.date;
-        config.data.hour = param.param.hour;
-        config.data.data = param.param.data;
         config.data.companyNo = param.param.companyNo;
         config.data.traceCode = param.param.traceCode;
         config.data.itemName = param.param.itemName;

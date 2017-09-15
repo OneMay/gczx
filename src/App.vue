@@ -9,17 +9,8 @@
             <bmap  v-on:tellToBmap="getToBmap" v-if="show=='bmap'"></bmap>
             <wuling v-if="show=='wuling'" v-on:tellToNamel="getProductName" v-on:tellToGeol="getToGeo" :setName="name"></wuling>
         </div>
-        <!-- <router-link :to="'/detail'">产品中心</router-link><router-view></router-view> -->
-        <td>
-            <a href="javascript:;" class="md-trigger btn btn-primary btn-sm" id="click" data-modal="modal-4">Show Me</a>
-        </td>
-        <div class="md-modal md-effect-4" id="modal-4">
-            <div class="md-content">
-                <detail v-model="productName" :choseName="productName"></detail>
-                <button class="md-close btn-sm btn-primary">Close me!</button>
-            </div>
-        </div>
-        <div class="md-overlay"></div>
+
+<router-view></router-view>
     </div>
 </template>
 
@@ -109,43 +100,17 @@ export default {
                     data=JSON.parse(res.data)
                 }
                 var dataList= data.contents.list;
-                dataList.forEach(function(val,index){
-                    var time =parseInt(val.measureTime)*1000; 
-                    var measureTime=new Date(time);    
-                    console.log(formatDate(measureTime));
-                    console.log(val.measureItemData);
-                })
+                console.log(res.data)
+                // dataList.forEach(function(val,index){
+                //     var time =parseInt(val.measureTime)*1000; 
+                //     var measureTime=new Date(time);    
+                //     console.log(formatDate(measureTime));
+                //     console.log(val.measureItemData);
+                // })
             })
             .catch(err=>{
                 console.log(err)
-            })
-        //     $.ajax({
-        //     url:'api/1.0/ll/enterprise/environment/getAllMeasureData',
-        //     type:'POST',
-        //     contentType:'application/json',
-        //     data:`{
-        //       "traceCode":"9693256390009800000000010",
-        //       "itemName":"Temperature",
-        //       "measureTime":${timestamp},
-        //       "baseNo":"BN001",
-        //       "companyNo":2  
-        //     }`,
-        //     success:function(data){
-        //         var db=JSON.parse(data)
-        //         var dataList= db.contents.list;
-        //         dataList.forEach(function(val,index){
-        //             var time =parseInt(val.measureTime)*1000; 
-        //             var measureTime=new Date(time);    
-        //             console.log(formatDate(measureTime));
-        //             console.log(val.measureItemData);
-        //         })
-        //       //console.log(db.contents.list);
-        //     },
-        //     err:function(err){
-        //       console.log(err);
-        //     }
-        //   })
-          
+            })    
         }
         getEnviromentData();
         function formatDate(now)   {     
@@ -165,119 +130,18 @@ export default {
             return   year+"-"+month+"-"+date+"   "+hour;     
         }
         //setInterval(getEnviromentData,5000);
-            function classReg(className) {
-                return new RegExp("(^|\\s+)" + className + "(\\s+|$)");
+        },
+        getPosition(){
+            if(window.location.pathname=="/environment"){
+                this.show='environment';
+                document.getElementById('nav').style.display="none";
             }
-
-            // classList support for class management
-            // altho to be fair, the api sucks because it won't accept multiple classes at once
-            var hasClass, addClass, removeClass;
-
-            if ('classList' in document.documentElement) {
-                hasClass = function (elem, c) {
-                    return elem.classList.contains(c);
-                };
-                addClass = function (elem, c) {
-                    elem.classList.add(c);
-                };
-                removeClass = function (elem, c) {
-                    elem.classList.remove(c);
-                };
-            } else {
-                hasClass = function (elem, c) {
-                    return classReg(c).test(elem.className);
-                };
-                addClass = function (elem, c) {
-                    if (!hasClass(elem, c)) {
-                        elem.className = elem.className + ' ' + c;
-                    }
-                };
-                removeClass = function (elem, c) {
-                    elem.className = elem.className.replace(classReg(c), ' ');
-                };
-            }
-
-            function toggleClass(elem, c) {
-                var fn = hasClass(elem, c) ? removeClass : addClass;
-                fn(elem, c);
-            }
-
-            var classie = {
-                // full names
-                hasClass: hasClass,
-                addClass: addClass,
-                removeClass: removeClass,
-                toggleClass: toggleClass,
-                // short names
-                has: hasClass,
-                add: addClass,
-                remove: removeClass,
-                toggle: toggleClass
-            };
-
-            // transport
-            if (typeof define === 'function' && define.amd) {
-                // AMD
-                define(classie);
-            } else {
-                // browser global
-                window.classie = classie;
-            }
-
-            var ModalEffects = (function () {
-
-                function init() {
-
-                    var overlay = document.querySelector('.md-overlay');
-
-                    [].slice.call(document.querySelectorAll('.md-trigger')).forEach(function (el, i) {
-                        //alert(1111);
-                        var modal = document.querySelector('#' + el.getAttribute('data-modal')),
-                            close = modal.querySelector('.md-close');
-
-                        function removeModal(hasPerspective) {
-                            classie.remove(modal, 'md-show');
-
-                            if (hasPerspective) {
-                                classie.remove(document.documentElement, 'md-perspective');
-                            }
-                        }
-
-                        function removeModalHandler() {
-                            removeModal(classie.has(el, 'md-setperspective'));
-                        }
-
-                        el.addEventListener('click', function (ev) {
-                            // alert(ev);
-                            // console.log(ev)
-                            classie.add(modal, 'md-show');
-                            overlay.removeEventListener('click', removeModalHandler);
-                            overlay.addEventListener('click', removeModalHandler);
-
-                            if (classie.has(el, 'md-setperspective')) {
-                                setTimeout(function () {
-                                    classie.add(document.documentElement, 'md-perspective');
-                                }, 25);
-                            }
-                        });
-
-                        close.addEventListener('click', function (ev) {
-                            ev.stopPropagation();
-                            removeModalHandler();
-                        });
-
-                    });
-
-                }
-
-                init();
-
-            })();
+           this.start();
         }
     },
     mounted() {
         this.$nextTick(function () {
-            this.start();
+            this.getPosition();
         })
     },
     components: {

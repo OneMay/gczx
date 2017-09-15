@@ -12,6 +12,8 @@
 import echarts from 'echarts'
 import './../../static/map/wulingshan/wulingshan.js'
 import './../../static/js/page/index.js'
+import AXIOS from './../axios/axios'
+const Axios = new AXIOS();
 export default {
     name: 'wuling',
     data() {
@@ -116,6 +118,8 @@ export default {
             myChart: '',
             count: 1,
             num:1,
+            placeList:[],
+            echartData:[]
         }
     },
     props:['setName'],
@@ -142,7 +146,14 @@ export default {
                 }
             }*/
             //alert(param.name);
-            if (this.option.geo.map&&this.option.geo.map!=param.name&&param.name!='设备1') {
+            var paramName=[];
+            console.log(this.echartData)
+            this.echartData.forEach((val,index)=>{
+                paramName.push(val.name)
+            })
+            console.log(paramName);
+            console.log(that.echartData[0].name);
+            if (this.option.geo.map&&this.option.geo.map!=param.name&&paramName.indexOf(param.name)<0) {
                 ++this.count;
                 //alert(this.count);
                 
@@ -152,15 +163,25 @@ export default {
             count=this.count+1;
             if (count >2) {
                 //alert(count);
-                if (param.name == "设备1") {
+                if (paramName.indexOf(param.name)>=0) {
                     this.getName=param.name;
-                    this.$emit('tellToNamel',this.getName);
-                    $('#click')[0].click();
+                   // this.$emit('tellToNamel',this.getName);
+                   // $('#click')[0].click();
+                   var data={}
+                   if(param.name='白鸟村茶园'){
+                       data.baseNo='BN001';
+                       data.companyNo=2;
+                       data.traceCode='9693256390009800000000010'
+                   }
+
+                   //this.$store.dispatch('change',data)
+                   //console.log(this.$store.getters.getData);
+                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.traceCode);
                     return
                 }
                 if(count>=2){
                     this.num++;
-                    if(this.num>2&&param.name!='设备1'){
+                    if(this.num>2&&paramName.indexOf(param.name)<0){
                         this.msg.show='bmap';
                         this.msg.name=param.name;
                         this.msg.arr=this.name;
@@ -184,14 +205,14 @@ export default {
             if (param.name == '鹤峰县') {
                 Object.assign(this.option.series[0], {
                     data: [{
-                        name: '设备1',
+                        name: that.echartData[0].name,
                         value: [110.1721, 29.84]
                     }, {
-                        name: '设备2',
+                        name: that.echartData[1].name,
                         value: [110.3721, 29.94]
                     },
                     {
-                        name: '设备3',
+                        name: that.echartData[2].name,
                         value: [110.3021, 30.04]
                     }]
                 })
@@ -201,6 +222,7 @@ export default {
             this.myChart.setOption(this.option, true);
         },
         returnClick() {
+            var that=this;
             this.myChart.showLoading();
             var n=this.count;
             this.count--;
@@ -235,14 +257,14 @@ export default {
             if (this.option.geo.map == '鹤峰县') {
                 Object.assign(this.option.series[0], {
                     data: [{
-                        name: '设备1',
+                        name: that.echartData[0].name,
                         value: [110.1721, 29.84]
                     }, {
-                        name: '设备2',
+                        name: that.echartData[1].name,
                         value: [110.3721, 29.94]
                     },
                     {
-                        name: '设备3',
+                        name: that.echartData[2].name,
                         value: [110.3021, 30.04]
                     }]
                 })
@@ -276,6 +298,14 @@ export default {
             })
         },
         drawGraph(id) {
+            var that = this;
+            this.placeList.forEach(function(val,index){
+                that.echartData.push({
+                    name:val.baseName,
+                    value:[val.latitudePosition,val.longitudePosition]
+                })
+            })
+            alert(this.echartData)
             this.myChart = echarts.init(document.getElementById('echarts'));
             this.myChart.showLoading();
             
@@ -284,6 +314,7 @@ export default {
             var node = document.getElementById('returnGeo');
             var node2 = document.getElementById('echarts');
             var that = this;
+
         //     node.removeEventListener("dblclick",function(){
         //     //that.returnClick();
         // })
@@ -308,11 +339,46 @@ export default {
             
             
 
+        },
+         getPosition(){
+             var that=this;
+            let params={
+                api:'http://localhost:8088/api/1.0/ll/enterprise/environment/getModule',
+                param:{
+                }
+            }
+            Axios.post(params)
+            .then(res=>{
+                var data;
+                if(typeof (res.data) == "object" && Object.prototype.toString.call(res.data).toLowerCase() == "[object object]" && !res.data.length){
+                    data=res.data;
+                }else{
+                    data=JSON.parse(res.data)
+                }
+                var dataList= data.contents.list;
+                dataList.forEach(function(val,index){
+                    that.placeList.push({
+                       baseName:val.baseName,
+                       baseNo:val.baseNo,
+                       companyNo:2,
+                       latitudePosition:val.latitudePosition,
+                       longitudePosition:val.longitudePosition
+                    })
+                })
+                //alert( that.placeList)
+                that.drawGraph('echarts');
+                //console.log(that.placeList)
+            })
+            .catch(err=>{
+                console.log(err)
+                that.drawGraph('echarts');
+            })
         }
     },
     mounted() {
         this.$nextTick(function () {
-            this.drawGraph('echarts');
+            this.getPosition();
+            
         })
     }
 
