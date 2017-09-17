@@ -1,6 +1,6 @@
 <template>
     <div class="map">
-       <div id="echarts" :style="{width:'1000px',height:'800px',margin:'20px auto'}">
+       <div id="mecharts" :style="{width:'1000px',height:'800px',margin:'20px auto'}">
        
     </div> 
      <button class="md-close btn-sm btn-primary" @click="returnClick">返回</button>
@@ -47,6 +47,8 @@ import 'echarts/map/js/province/zhejiang.js'
 import 'echarts/map/js/china.js'
 import 'echarts/map/js/china-contour.js'
 import './../../static/js/page/index.js'
+import AXIOS from './../axios/axios'
+const Axios = new AXIOS();
 export default {
     name: 'geo',
     data() {
@@ -152,6 +154,8 @@ export default {
             myChart: '',
             count: 1,
             num:1,
+            placeList:[],
+            echartData:[]
         }
     },
     props:['setName'],
@@ -177,11 +181,15 @@ export default {
                     return
                 }
             }*/
+             var paramName=[];
+            this.echartData.forEach((val,index)=>{
+                paramName.push(val.name)
+            })
             if (param.name== '南海诸岛') {
                     return ;
                 }
             //alert(param.name);
-            if (this.option.geo.map&&this.option.geo.map!=param.name&&param.name!='设备1') {
+            if (this.option.geo.map&&this.option.geo.map!=param.name&&paramName.indexOf(param.name)<0) {
                 ++this.count;
                 //alert(this.count);
                 
@@ -191,15 +199,34 @@ export default {
             count=this.count+1;
             if (count >4) {
                 //alert(count);
-                if (param.name == "设备1") {
-                    this.getName=param.name;
-                    this.$emit('tellToName',this.getName);
-                    $('#click')[0].click();
+                if (paramName.indexOf(param.name)>=0) {
+                     this.getName=param.name;
+                   // this.$emit('tellToNamel',this.getName);
+                   // $('#click')[0].click();
+                   var data={}
+                   var paramName=param.name.toString();
+
+                   if(paramName=="百鸟村茶园"){
+                       data.baseNo='BN001';
+                       data.companyNo=2;
+                       data.traceCode='9693256390009800000000010'
+
+                   }
+
+                   if(paramName=="桃园基地"){
+                       data.baseNo='TY001';
+                       data.companyNo=2;
+                       data.traceCode='969704861327040000000001X'
+                   }
+
+                   //this.$store.dispatch('change',data)
+                   //console.log(this.$store.getters.getData);
+                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.traceCode);
                     return
                 }
                 if(count>=5){
                     this.num++;
-                    if(this.num>2&&param.name!='设备1'){
+                    if(this.num>2&&paramName.indexOf(param.name)<0){
                         this.msg.show='bmap';
                         this.msg.name=param.name;
                         this.msg.arr=this.name;
@@ -239,14 +266,14 @@ export default {
             if (param.name == '鹤峰县') {
                 Object.assign(this.option.series[0], {
                     data: [{
-                        name: '设备1',
+                        name: that.echartData[0].name,
                         value: [110.1721, 29.84]
                     }, {
-                        name: '设备2',
+                        name: that.echartData[1].name,
                         value: [110.3721, 29.94]
                     },
                     {
-                        name: '设备3',
+                        name: that.echartData[2].name,
                         value: [110.3021, 30.04]
                     }]
                 })
@@ -304,16 +331,16 @@ export default {
                 })
             }
             if (this.option.geo.map == '鹤峰县') {
-                Object.assign(this.option.series[0], {
+               Object.assign(this.option.series[0], {
                     data: [{
-                        name: '设备1',
+                        name: that.echartData[0].name,
                         value: [110.1721, 29.84]
                     }, {
-                        name: '设备2',
+                        name: that.echartData[1].name,
                         value: [110.3721, 29.94]
                     },
                     {
-                        name: '设备3',
+                        name: that.echartData[2].name,
                         value: [110.3021, 30.04]
                     }]
                 })
@@ -347,7 +374,14 @@ export default {
             })
         },
         drawGraph(id) {
-            this.myChart = echarts.init(document.getElementById('echarts'));
+            var that = this;
+            this.placeList.forEach(function(val,index){
+                that.echartData.push({
+                    name:val.baseName,
+                    value:[val.latitudePosition,val.longitudePosition]
+                })
+            })
+            this.myChart = echarts.init(document.getElementById(id));
             this.myChart.showLoading();
             
             //this.myChart.setOption(this.option);
@@ -377,11 +411,47 @@ export default {
             
             
 
+        },
+        getPosition(){
+             var that=this;
+            let params={
+                api:'http://localhost:8088/getPosition/api/1.0/ll/enterprise/environment/getModule',
+                param:{
+                }
+            }
+            Axios.post(params)
+            .then(res=>{
+                var data;
+                if(typeof (res.data) == "object" && Object.prototype.toString.call(res.data).toLowerCase() == "[object object]" && !res.data.length){
+                    data=res.data;
+                }else{
+                    data=JSON.parse(res.data)
+                }
+                var dataList= data.contents.list;
+                dataList.forEach(function(val,index){
+                    that.placeList.push({
+                       baseName:val.baseName,
+                       baseNo:val.baseNo,
+                       companyNo:2,
+                       latitudePosition:val.latitudePosition,
+                       longitudePosition:val.longitudePosition
+                    })
+                })
+                //alert( that.placeList)
+                if(document.getElementById('mecharts')){
+                    that.drawGraph('mecharts');
+                }
+                //console.log(that.placeList)
+            })
+            .catch(err=>{
+                console.log(err)
+                that.drawGraph('mecharts');
+            })
         }
     },
     mounted() {
         this.$nextTick(function () {
-            this.drawGraph('echarts');
+            this.getPosition();
         })
     }
 

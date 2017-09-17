@@ -6,7 +6,7 @@
     import echarts from 'echarts'
     import AXIOS from './../../axios/axios'
     const Axios = new AXIOS();
-const url = 'http://localhost:8088';
+const url = 'http://localhost:8088/getenvironment';
     export default {
         name:'temperature',
         data(){
@@ -77,6 +77,7 @@ const url = 'http://localhost:8088';
                 var n=num;
                 this.option.xAxis.data=[];
                 var hour = this.getenvir.hours;
+                this.myecharts.showLoading();
                 if(num==0){
                     // if(year!=this.today.year||month!=this.today.month||day!=this.today.day)
                     // {
@@ -201,11 +202,19 @@ const url = 'http://localhost:8088';
                 }else{
                     this.option.title.text='最近'+n+'天气温变化';
                 }
-                this.myecharts.showLoading();
                 this.myecharts.hideLoading();
                 this.myecharts.setOption(this.option, true);  
             },
             drawGraph(id) { 
+                var query = location.search.substring(1);
+                // var queryStr=query.replace(/=/g,':');
+                var values= query.split("&");
+                var data={
+                    baseNo:values[0],
+                    companyNo:2,
+                    traceCode:values[1]
+                }
+                this.$store.dispatch('change',data);
                 var date = new Date();
                 var year = date.getFullYear();
                 var month = date.getMonth() + 1;
@@ -218,8 +227,10 @@ const url = 'http://localhost:8088';
                 this.getenvir.month=month;
                 this.getenvir.day=day;
                 this.setData(year,month,day,7);
+                
             },
         getData(dates,n){
+            this.myecharts.showLoading();
             var postData=this.$store.getters.getData;
              var date = new Date();
             var year=date.getFullYear();
@@ -244,7 +255,6 @@ const url = 'http://localhost:8088';
                     var time = date.getTime();
                     timestamp=time/1000;
                 }
-                alert(dates)
                 let params={
                      api:url+'/api/1.0/ll/enterprise/environment/getAllMeasureData',
                     param:{
@@ -264,9 +274,9 @@ const url = 'http://localhost:8088';
                     }else{
                         data=JSON.parse(res.data)
                     }
-                    console.log(data)
+                    this.myecharts.showLoading();
                     //console.log(data.temparatureInfo[0].staticTemperatureInfo.datas)
-                    if(data.contents.list){
+                    if(data.contents.list.length>0){
                         var dataList= data.contents.list;
                         var datas=[];
                         var hourTime=[]
@@ -342,11 +352,18 @@ const url = 'http://localhost:8088';
                 })
             }
             if(n==7||n==30){
-                var time =[date]
+                var postData=this.$store.getters.getData;
+                //alert(postData.traceCode);
+                var timestamp = Date.parse(new Date())/1000;
                 let params={
-                    api:url+'/api/find/staticTemperature',
+                    api:url+'/api/1.0/ll/enterprise/environment/getMeasureDataByDays',
                     param:{
-                        date:date
+                        "traceCode":postData.traceCode,
+                        "itemName":"Temperature",
+                        "measureTime":timestamp,
+                        "baseNo":postData.baseNo,
+                        "companyNo":2 ,
+                        "days":n
                     }
                 }
                 Axios.post(params)
@@ -359,21 +376,13 @@ const url = 'http://localhost:8088';
                         data=JSON.parse(res.data)
                     }
                      this.myecharts.showLoading();
-                    for(var i=0;i<data.temparatureInfo.length;i++){
-                        for(var j = i + 1;j<data.temparatureInfo.length;j++){
-                            if(data.temparatureInfo[i].date>data.temparatureInfo[j].date){
-                                var tmp = data.temparatureInfo[i];
-                                data.temparatureInfo[i] = data.temparatureInfo[j];
-                                data.temparatureInfo[j] = tmp;
-                            }
-                        }
-                    }
                     //console.log(data)
+                    var dataList=data.contents.list;
                     var MaxDatas=[],MinDatas=[],averageDatas=[];
-                    data.temparatureInfo.forEach(function(val,index) {
-                        MaxDatas.push(val.MaxData);
-                        MinDatas.push(val.MinData);
-                        averageDatas.push(val.average);
+                    dataList.forEach(function(val,index) {
+                        MaxDatas.push(val.maxData);
+                        MinDatas.push(val.minData);
+                        averageDatas.push(val.avgData);
                     });
                     
                     this.option.legend.data=['最高气温','平均气温','最低气温']
@@ -469,7 +478,7 @@ const url = 'http://localhost:8088';
         },
         mounted() {  
             this.$nextTick(function() {  
-                this.drawGraph('temperature'); 
+                setTimeout(this.drawGraph('temperature'),1000);
             })  
         }
     }

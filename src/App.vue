@@ -16,7 +16,6 @@
 
 <script>
 import geo from './components/geo'
-import detail from './components/the-product'
 import bmap from './components/bmap'
 import wuling from './components/wuling'
 import './../static/css/lib/bootstrap.css'
@@ -82,7 +81,7 @@ export default {
         function getEnviromentData(){
             var timestamp = Date.parse(new Date())/1000;
             let params={
-                api:'http://localhost:8088/api/1.0/ll/enterprise/environment/getAllMeasureData',
+                api:'http://localhost:8088/getenvironment/api/1.0/ll/enterprise/environment/getAllMeasureData',
                 param:{
                     "traceCode":"9693256390009800000000010",
                     "itemName":"Temperature",
@@ -100,7 +99,7 @@ export default {
                     data=JSON.parse(res.data)
                 }
                 var dataList= data.contents.list;
-                console.log(res.data)
+               // console.log(res.data)
                 // dataList.forEach(function(val,index){
                 //     var time =parseInt(val.measureTime)*1000; 
                 //     var measureTime=new Date(time);    
@@ -136,7 +135,6 @@ export default {
                 this.show='environment';
                 document.getElementById('nav').style.display="none";
             }
-           this.start();
         }
     },
     mounted() {
@@ -146,7 +144,6 @@ export default {
     },
     components: {
         geo,
-        detail,
         bmap,
         wuling
     }

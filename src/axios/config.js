@@ -47,10 +47,11 @@ export default {
         measureTime: null,
         baseNo: "BN001",
         companyNo: 2,
+        days: '',
         strSQL: ""
     },
 
-    timeout: 5000,
+    timeout: 60000,
 
     withCredentials: true, // default false
 

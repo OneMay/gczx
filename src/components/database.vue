@@ -1,10 +1,9 @@
 <template>
     <div>
-        <changeImg :getUrl="Url" :getHeight="height" :getWidth="width"></changeImg>
         <div class="clearfix" :style="{width:'1203px',margin:'0 auto'}">
             <div class="environment">
                 <div class="charts">
-                    <h2 class="tea-Data">环境数据</h2>
+                    <h2 class="tea-Data" v-text="placeName">环境数据</h2>
                     <ul class="nav nav-tabs" id="chartOne" role="tablist">
                         <li role="presentation">
                             <button class="btn" :class="classObj" @click="chartOne(1)">温度</button>
@@ -133,6 +132,7 @@ export default {
             },
             show: 'temperature',
             getDOM:null,
+            placeName:""
         }
     },
     methods: {
@@ -283,16 +283,27 @@ export default {
         getDates() {
             //alert(window.location.hash);
             //console.log(this.$store.getters.getData);
-            var query = location.search.substring(1);
-           // var queryStr=query.replace(/=/g,':');
-            var values= query.split("&");
-            var data={
-                baseNo:values[0],
-                companyNo:2,
-                traceCode:values[1]
+            var that=this;
+            function set(){
+                var query = location.search.substring(1);
+                // var queryStr=query.replace(/=/g,':');
+                    var values= query.split("&");
+                    var data={
+                        baseNo:values[0],
+                        companyNo:2,
+                        traceCode:values[1]
+                    }
+                    that.$store.dispatch('change',data);
+                var positionData=that.$store.getters.getData;
+                if(positionData.baseNo=='BN001'){
+                    that.placeName='百鸟村茶园环境数据'
+                }
+                if(positionData.baseNo=='TY001'){
+                    that.placeName='桃园基地环境数据'
+                }
             }
-            this.$store.dispatch('change',data)
-            console.log(this.$store.getters.getData);
+            set();
+            
             var date = new Date();
             var year=date.getFullYear();
             var month = date.getMonth() + 1;

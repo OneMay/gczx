@@ -6,7 +6,7 @@
     import echarts from 'echarts'
     import AXIOS from './../../axios/axios'
     const Axios = new AXIOS();
-const url = 'http://localhost:8080';
+const url = 'http://localhost:8088/getenvironment';
     export default {
         name:'windspeed',
         data(){
@@ -17,7 +17,7 @@ const url = 'http://localhost:8080';
                     },
                     tooltip: {
                         trigger: 'axis'
-                        //formatter: '{a}\n{b}: {c}m/s'
+                        
                     },
                     legend: {
                         data:[],
@@ -64,7 +64,8 @@ const url = 'http://localhost:8080';
                 //注意：当观察的数据为对象或数组时，curVal和oldVal是相等的，因为这两个形参指向的是同一个数据对象
                 handler(curVal, oldVal) {
                     
-                    this.setData(curVal.year, curVal.month,curVal.day,curVal.num);
+                     this.setData(curVal.year, curVal.month,curVal.day,curVal.num);
+                    //this.setData('2017', '08','01',7);
                     //setTimeout(this.setDate(curVal.year, curVal.month),0);
                 },
                 deep: true
@@ -76,16 +77,17 @@ const url = 'http://localhost:8080';
                 var n=num;
                 this.option.xAxis.data=[];
                 var hour = this.getenvir.hours;
+                this.myecharts.showLoading();
                 if(num==0){
-                    if(year!=this.today.year||month!=this.today.month||day!=this.today.day)
-                    {
-                        hour=23
-                    }
-                    while(hour>=0){
-                        this.option.xAxis.data.push(hour+':00');
-                        hour--;
-                    }
-                    this.option.xAxis.data=this.option.xAxis.data.reverse();
+                    // if(year!=this.today.year||month!=this.today.month||day!=this.today.day)
+                    // {
+                    //     hour=23
+                    // }
+                    // while(hour>=0){
+                    //     this.option.xAxis.data.push(hour+':00');
+                    //     hour--;
+                    // }
+                    this.option.xAxis.data=[];
                     var date=year+'-'+month+'-'+day;
                     this.getData(date,1);
                 }
@@ -196,15 +198,23 @@ const url = 'http://localhost:8080';
                     this.getData(date,30);
                 }
                 if(n==0){
-                    this.option.title.text=(year+'-'+month+'-'+day+'风速变化');
+                    this.option.title.text=(year+'-'+month+'-'+day+'风速风向变化');
                 }else{
-                    this.option.title.text='最近'+n+'天风速变化';
+                    this.option.title.text='最近'+n+'天风速风向变化';
                 }
-                this.myecharts.showLoading();
                 this.myecharts.hideLoading();
                 this.myecharts.setOption(this.option, true);  
             },
             drawGraph(id) { 
+                var query = location.search.substring(1);
+            // var queryStr=query.replace(/=/g,':');
+                var values= query.split("&");
+                var data={
+                    baseNo:values[0],
+                    companyNo:2,
+                    traceCode:values[1]
+                }
+                this.$store.dispatch('change',data);
                 var date = new Date();
                 var year = date.getFullYear();
                 var month = date.getMonth() + 1;
@@ -218,13 +228,40 @@ const url = 'http://localhost:8080';
                 this.getenvir.day=day;
                 this.setData(year,month,day,7);
             },
-        getData(date,n){
+        getData(dates,n){
+            this.myecharts.showLoading();
+            var postData=this.$store.getters.getData;
+             var date = new Date();
+            var year=date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (month < 10) {
+                month = '0' + month;
+            }
+            if (day < 10) {
+                day = '0' + day;
+            }
+            var dateString = year + "-" + month + "-" + day;
+            var timestamp;
             if(n==1){
-                var time =[date]
+                var time =[dates]
+                if(dateString==time[0]){
+                     timestamp = Date.parse(new Date())/1000;
+                }else{
+                    var str=time[0]+' 08:00';
+                    str = str.replace(/-/g,'/');
+                    var date = new Date(str);
+                    var time = date.getTime();
+                    timestamp=time/1000;
+                }
                 let params={
-                    api:url+'/api/find/staticWindspeed',
+                     api:url+'/api/1.0/ll/enterprise/environment/getAllMeasureData',
                     param:{
-                        date:time
+                        "traceCode":postData.traceCode,
+                        "itemName":"windspeed",
+                        "measureTime":timestamp,
+                        "baseNo":postData.baseNo,
+                        "companyNo":2 
                     }
                 }
                 Axios.post(params)
@@ -236,25 +273,41 @@ const url = 'http://localhost:8080';
                     }else{
                         data=JSON.parse(res.data)
                     }
-                    if(data.WindspeedInfo){
-                         this.myecharts.showLoading();
-                        for(var i=0;i<data.WindspeedInfo[0].staticWindspeedInfo.datas.length;i++){
-                            for(var j = i + 1;j<data.WindspeedInfo[0].staticWindspeedInfo.datas.length;j++){
-                                if(parseInt(data.WindspeedInfo[0].staticWindspeedInfo.datas[i].hour)>parseInt(data.WindspeedInfo[0].staticWindspeedInfo.datas[j].hour)){
-                                    var tmp = data.WindspeedInfo[0].staticWindspeedInfo.datas[i];
-                                    data.WindspeedInfo[0].staticWindspeedInfo.datas[i] = data.WindspeedInfo[0].staticWindspeedInfo.datas[j];
-                                    data.WindspeedInfo[0].staticWindspeedInfo.datas[j] = tmp;
-                                }
-                            }
-                    }
+                    this.myecharts.showLoading();
+                    //console.log(data.temparatureInfo[0].staticTemperatureInfo.datas)
+                    if(data.contents.list.length>0){
+                        var dataList= data.contents.list;
                         var datas=[];
-                        data.WindspeedInfo[0].staticWindspeedInfo.datas.forEach(function(val,index){
-                            datas.push(val.data);
+                        var hourTime=[]
+                        dataList.forEach(function(val,index){
+                            var time =parseInt(val.measureTime)*1000; 
+                            var measureTime=new Date(time);    
+                            //console.log(formatDate(measureTime));
+                           // console.log(val.measureItemData);
+                            datas.push(val.measureItemData)
+                            hourTime.push(formatDate(measureTime));
                         })
-                        this.option.legend.data=['风速'];
+                         function formatDate(now)   {     
+                            var   year=now.getFullYear();     
+                            var   month=now.getMonth()+1;     
+                            var   date=now.getDate();     
+                            var   hour=now.getHours();     
+                            var   minute=now.getMinutes();     
+                            var   second=now.getSeconds();
+                            if (month < 10) {
+                                month = '0' + month;
+                            }
+                            if (date < 10) {
+                                date = '0' + date;
+                            }
+                            hour=hour+':00';     
+                            return   hour;     
+                        }
+                        this.option.xAxis.data=hourTime;
+                        this.option.legend.data=['风速风向'];
                         this.option.series=[];
                         this.option.series=[{
-                            name:'风速',
+                            name:'风速风向',
                             type:'line',
                             data:datas,
                             markPoint:{
@@ -268,7 +321,7 @@ const url = 'http://localhost:8080';
                                 label:{
                                     emphasis:{
                                         show:true,
-                                        formatter: '{a}\n{b}: {c}m/s'
+                                        formatter: '{a}\n{b}: {c}'
                                     }
                                 },
                                 data: [
@@ -283,7 +336,7 @@ const url = 'http://localhost:8080';
                         this.option.legend.data=[];
                         this.option.series=[];
                         this.myecharts.showLoading({
-                            text : '暂无24小时风速数据',
+                            text : '暂无24小时风速风向数据',
                             effect : 'bubble',
                             textStyle : {
                                 fontSize : 30
@@ -298,11 +351,17 @@ const url = 'http://localhost:8080';
                 })
             }
             if(n==7||n==30){
-                var time =[date]
+                var postData=this.$store.getters.getData;
+                var timestamp = Date.parse(new Date())/1000;
                 let params={
-                    api:url+'/api/find/staticWindspeed',
+                    api:url+'/api/1.0/ll/enterprise/environment/getMeasureDataByDays',
                     param:{
-                        date:date
+                        "traceCode":postData.traceCode,
+                        "itemName":"windspeed",
+                        "measureTime":timestamp,
+                        "baseNo":postData.baseNo,
+                        "companyNo":2 ,
+                        "days":n
                     }
                 }
                 Axios.post(params)
@@ -315,25 +374,18 @@ const url = 'http://localhost:8080';
                         data=JSON.parse(res.data)
                     }
                      this.myecharts.showLoading();
-                    for(var i=0;i<data.WindspeedInfo.length;i++){
-                        for(var j = i + 1;j<data.WindspeedInfo.length;j++){
-                            if(data.WindspeedInfo[i].date>data.WindspeedInfo[j].date){
-                                var tmp = data.WindspeedInfo[i];
-                                data.WindspeedInfo[i] = data.WindspeedInfo[j];
-                                data.WindspeedInfo[j] = tmp;
-                            }
-                        }
-                    }
+                    //console.log(data)
+                    var dataList=data.contents.list;
                     var MaxDatas=[],MinDatas=[],averageDatas=[];
-                    data.WindspeedInfo.forEach(function(val,index) {
-                        MaxDatas.push(val.MaxData);
-                        MinDatas.push(val.MinData);
-                        averageDatas.push(val.average);
+                    dataList.forEach(function(val,index) {
+                        MaxDatas.push(val.maxData);
+                        MinDatas.push(val.minData);
+                        averageDatas.push(val.avgData);
                     });
                     
-                    this.option.legend.data=['最大风速','平均风速','最小风速']
+                    this.option.legend.data=['风速最大值','风速平均值','风速最小值']
                     this.option.series=[ {
-                            name:'最大风速',
+                            name:'风速最大值',
                             type:'line',
                             data:MaxDatas,
                             markPoint:{
@@ -357,7 +409,7 @@ const url = 'http://localhost:8080';
                             }
                         },
                         {
-                            name:'平均风速',
+                            name:'风速平均值',
                             type:'line',
                             data:averageDatas,
                              itemStyle:{
@@ -385,7 +437,7 @@ const url = 'http://localhost:8080';
                             }
                         },
                         {
-                            name:'最小风速',
+                            name:'风速最小值',
                             type:'line',
                             data:MinDatas,
                             itemStyle:{
@@ -424,7 +476,7 @@ const url = 'http://localhost:8080';
         },
         mounted() {  
             this.$nextTick(function() {  
-                this.drawGraph('windspeed'); 
+               setTimeout( this.drawGraph('windspeed'),2000);
             })  
         }
     }

@@ -28,11 +28,18 @@ module.exports = {
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         proxyTable: {
-            '/api': {
+            '/getPosition': {
                 target: 'http://59.68.29.89:18081',
                 changeOrigin: true,
                 pathRewrite: {
-                    '^/api': '/api'
+                    '^/getPosition': ''
+                }
+            },
+            '/getenvironment': {
+                target: 'http://www.apqte.com',
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/getAllMeasureData': ''
                 }
             }
         },

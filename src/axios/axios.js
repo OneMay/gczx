@@ -21,6 +21,7 @@ export class AXIOS {
         config.data.itemName = param.param.itemName;
         config.data.measureTime = param.param.measureTime;
         config.data.baseNo = param.param.baseNo;
+        config.data.days = param.param.days;
         config.data = Qs.parse(config.data);
         //console.log(config)
         return axios.post(param.api, {}, config);

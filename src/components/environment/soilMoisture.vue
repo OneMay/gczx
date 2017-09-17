@@ -1,14 +1,14 @@
 <template>
-    <div id="soilMoisture" :style="{width:'1200px',height:'400px'}"></div>
+    <div id="soilhumidity" :style="{width:'1200px',height:'400px'}"></div>
 </template>
 
 <script>
     import echarts from 'echarts'
     import AXIOS from './../../axios/axios'
     const Axios = new AXIOS();
-const url = 'http://localhost:8080';
+const url = 'http://localhost:8088/getenvironment';
     export default {
-        name:'soilMoisture',
+        name:'soilhumidity',
         data(){
             return {
                 option : {
@@ -17,7 +17,7 @@ const url = 'http://localhost:8080';
                     },
                     tooltip: {
                         trigger: 'axis'
-                        //formatter: '{a}\n{b}: {c}m/s'
+                        
                     },
                     legend: {
                         data:[],
@@ -64,7 +64,8 @@ const url = 'http://localhost:8080';
                 //注意：当观察的数据为对象或数组时，curVal和oldVal是相等的，因为这两个形参指向的是同一个数据对象
                 handler(curVal, oldVal) {
                     
-                    this.setData(curVal.year, curVal.month,curVal.day,curVal.num);
+                     this.setData(curVal.year, curVal.month,curVal.day,curVal.num);
+                    //this.setData('2017', '08','01',7);
                     //setTimeout(this.setDate(curVal.year, curVal.month),0);
                 },
                 deep: true
@@ -76,16 +77,17 @@ const url = 'http://localhost:8080';
                 var n=num;
                 this.option.xAxis.data=[];
                 var hour = this.getenvir.hours;
+                this.myecharts.showLoading();
                 if(num==0){
-                    if(year!=this.today.year||month!=this.today.month||day!=this.today.day)
-                    {
-                        hour=23
-                    }
-                    while(hour>=0){
-                        this.option.xAxis.data.push(hour+':00');
-                        hour--;
-                    }
-                    this.option.xAxis.data=this.option.xAxis.data.reverse();
+                    // if(year!=this.today.year||month!=this.today.month||day!=this.today.day)
+                    // {
+                    //     hour=23
+                    // }
+                    // while(hour>=0){
+                    //     this.option.xAxis.data.push(hour+':00');
+                    //     hour--;
+                    // }
+                    this.option.xAxis.data=[];
                     var date=year+'-'+month+'-'+day;
                     this.getData(date,1);
                 }
@@ -200,11 +202,19 @@ const url = 'http://localhost:8080';
                 }else{
                     this.option.title.text='最近'+n+'天土壤湿度变化';
                 }
-                this.myecharts.showLoading();
                 this.myecharts.hideLoading();
                 this.myecharts.setOption(this.option, true);  
             },
             drawGraph(id) { 
+                var query = location.search.substring(1);
+            // var queryStr=query.replace(/=/g,':');
+                var values= query.split("&");
+                var data={
+                    baseNo:values[0],
+                    companyNo:2,
+                    traceCode:values[1]
+                }
+                this.$store.dispatch('change',data);
                 var date = new Date();
                 var year = date.getFullYear();
                 var month = date.getMonth() + 1;
@@ -218,13 +228,40 @@ const url = 'http://localhost:8080';
                 this.getenvir.day=day;
                 this.setData(year,month,day,7);
             },
-        getData(date,n){
+        getData(dates,n){
+            this.myecharts.showLoading();
+            var postData=this.$store.getters.getData;
+             var date = new Date();
+            var year=date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (month < 10) {
+                month = '0' + month;
+            }
+            if (day < 10) {
+                day = '0' + day;
+            }
+            var dateString = year + "-" + month + "-" + day;
+            var timestamp;
             if(n==1){
-                var time =[date]
+                var time =[dates]
+                if(dateString==time[0]){
+                     timestamp = Date.parse(new Date())/1000;
+                }else{
+                    var str=time[0]+' 08:00';
+                    str = str.replace(/-/g,'/');
+                    var date = new Date(str);
+                    var time = date.getTime();
+                    timestamp=time/1000;
+                }
                 let params={
-                    api:url+'/api/find/staticSoilhumidity',
+                     api:url+'/api/1.0/ll/enterprise/environment/getAllMeasureData',
                     param:{
-                        date:time
+                        "traceCode":postData.traceCode,
+                        "itemName":"soilhumidity",
+                        "measureTime":timestamp,
+                        "baseNo":postData.baseNo,
+                        "companyNo":2 
                     }
                 }
                 Axios.post(params)
@@ -236,21 +273,37 @@ const url = 'http://localhost:8080';
                     }else{
                         data=JSON.parse(res.data)
                     }
-                    if(data.soilhumidityInfo){
-                        this.myecharts.showLoading();
-                        for(var i=0;i<data.soilhumidityInfo[0].staticSoilhumidityInfo.datas.length;i++){
-                            for(var j = i + 1;j<data.soilhumidityInfo[0].staticSoilhumidityInfo.datas.length;j++){
-                                if(parseInt(data.soilhumidityInfo[0].staticSoilhumidityInfo.datas[i].hour)>parseInt(data.soilhumidityInfo[0].staticSoilhumidityInfo.datas[j].hour)){
-                                    var tmp = data.soilhumidityInfo[0].staticSoilhumidityInfo.datas[i];
-                                    data.soilhumidityInfo[0].staticSoilhumidityInfo.datas[i] = data.soilhumidityInfo[0].staticSoilhumidityInfo.datas[j];
-                                    data.soilhumidityInfo[0].staticSoilhumidityInfo.datas[j] = tmp;
-                                }
-                            }
-                    }
+                    this.myecharts.showLoading();
+                    //console.log(data.temparatureInfo[0].staticTemperatureInfo.datas)
+                    if(data.contents.list.length>0){
+                        var dataList= data.contents.list;
                         var datas=[];
-                        data.soilhumidityInfo[0].staticSoilhumidityInfo.datas.forEach(function(val,index){
-                            datas.push(val.data);
+                        var hourTime=[]
+                        dataList.forEach(function(val,index){
+                            var time =parseInt(val.measureTime)*1000; 
+                            var measureTime=new Date(time);    
+                            //console.log(formatDate(measureTime));
+                           // console.log(val.measureItemData);
+                            datas.push(val.measureItemData)
+                            hourTime.push(formatDate(measureTime));
                         })
+                         function formatDate(now)   {     
+                            var   year=now.getFullYear();     
+                            var   month=now.getMonth()+1;     
+                            var   date=now.getDate();     
+                            var   hour=now.getHours();     
+                            var   minute=now.getMinutes();     
+                            var   second=now.getSeconds();
+                            if (month < 10) {
+                                month = '0' + month;
+                            }
+                            if (date < 10) {
+                                date = '0' + date;
+                            }
+                            hour=hour+':00';     
+                            return   hour;     
+                        }
+                        this.option.xAxis.data=hourTime;
                         this.option.legend.data=['土壤湿度'];
                         this.option.series=[];
                         this.option.series=[{
@@ -268,7 +321,7 @@ const url = 'http://localhost:8080';
                                 label:{
                                     emphasis:{
                                         show:true,
-                                        formatter: '{a}\n{b}: {c}%'
+                                        formatter: '{a}\n{b}: {c}'
                                     }
                                 },
                                 data: [
@@ -298,11 +351,17 @@ const url = 'http://localhost:8080';
                 })
             }
             if(n==7||n==30){
-                var time =[date]
+                var postData=this.$store.getters.getData;
+                var timestamp = Date.parse(new Date())/1000;
                 let params={
-                    api:url+'/api/find/staticSoilhumidity',
+                    api:url+'/api/1.0/ll/enterprise/environment/getMeasureDataByDays',
                     param:{
-                        date:date
+                        "traceCode":postData.traceCode,
+                        "itemName":"soilhumidity",
+                        "measureTime":timestamp,
+                        "baseNo":postData.baseNo,
+                        "companyNo":2 ,
+                        "days":n
                     }
                 }
                 Axios.post(params)
@@ -314,26 +373,19 @@ const url = 'http://localhost:8080';
                     }else{
                         data=JSON.parse(res.data)
                     }
-                    this.myecharts.showLoading();
-                    for(var i=0;i<data.soilhumidityInfo.length;i++){
-                        for(var j = i + 1;j<data.soilhumidityInfo.length;j++){
-                            if(data.soilhumidityInfo[i].date>data.soilhumidityInfo[j].date){
-                                var tmp = data.soilhumidityInfo[i];
-                                data.soilhumidityInfo[i] = data.soilhumidityInfo[j];
-                                data.soilhumidityInfo[j] = tmp;
-                            }
-                        }
-                    }
+                     this.myecharts.showLoading();
+                    //console.log(data)
+                    var dataList=data.contents.list;
                     var MaxDatas=[],MinDatas=[],averageDatas=[];
-                    data.soilhumidityInfo.forEach(function(val,index) {
-                        MaxDatas.push(val.MaxData);
-                        MinDatas.push(val.MinData);
-                        averageDatas.push(val.average);
+                    dataList.forEach(function(val,index) {
+                        MaxDatas.push(val.maxData);
+                        MinDatas.push(val.minData);
+                        averageDatas.push(val.avgData);
                     });
                     
-                    this.option.legend.data=['最大土壤湿度','平均土壤湿度','最小土壤湿度']
+                    this.option.legend.data=['土壤湿度最大值','土壤湿度平均值','土壤湿度最小值']
                     this.option.series=[ {
-                            name:'最大土壤湿度',
+                            name:'土壤湿度最大值',
                             type:'line',
                             data:MaxDatas,
                             markPoint:{
@@ -357,7 +409,7 @@ const url = 'http://localhost:8080';
                             }
                         },
                         {
-                            name:'平均土壤湿度',
+                            name:'土壤湿度平均值',
                             type:'line',
                             data:averageDatas,
                              itemStyle:{
@@ -385,7 +437,7 @@ const url = 'http://localhost:8080';
                             }
                         },
                         {
-                            name:'最小土壤湿度',
+                            name:'土壤湿度最小值',
                             type:'line',
                             data:MinDatas,
                             itemStyle:{
@@ -424,7 +476,7 @@ const url = 'http://localhost:8080';
         },
         mounted() {  
             this.$nextTick(function() {  
-                this.drawGraph('soilMoisture'); 
+               setTimeout( this.drawGraph('soilhumidity'),2000);
             })  
         }
     }

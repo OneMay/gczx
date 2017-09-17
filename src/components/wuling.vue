@@ -147,12 +147,12 @@ export default {
             }*/
             //alert(param.name);
             var paramName=[];
-            console.log(this.echartData)
+            //console.log(this.echartData)
             this.echartData.forEach((val,index)=>{
                 paramName.push(val.name)
             })
-            console.log(paramName);
-            console.log(that.echartData[0].name);
+           // console.log(paramName);
+           // console.log(that.echartData[0].name);
             if (this.option.geo.map&&this.option.geo.map!=param.name&&paramName.indexOf(param.name)<0) {
                 ++this.count;
                 //alert(this.count);
@@ -168,10 +168,19 @@ export default {
                    // this.$emit('tellToNamel',this.getName);
                    // $('#click')[0].click();
                    var data={}
-                   if(param.name='白鸟村茶园'){
+                   var paramName=param.name.toString();
+
+                   if(paramName=="百鸟村茶园"){
                        data.baseNo='BN001';
                        data.companyNo=2;
                        data.traceCode='9693256390009800000000010'
+
+                   }
+
+                   if(paramName=="桃园基地"){
+                       data.baseNo='TY001';
+                       data.companyNo=2;
+                       data.traceCode='969704861327040000000001X'
                    }
 
                    //this.$store.dispatch('change',data)
@@ -305,7 +314,7 @@ export default {
                     value:[val.latitudePosition,val.longitudePosition]
                 })
             })
-            alert(this.echartData)
+            //alert(this.echartData)
             this.myChart = echarts.init(document.getElementById('echarts'));
             this.myChart.showLoading();
             
@@ -343,7 +352,7 @@ export default {
          getPosition(){
              var that=this;
             let params={
-                api:'http://localhost:8088/api/1.0/ll/enterprise/environment/getModule',
+                api:'http://localhost:8088/getPosition/api/1.0/ll/enterprise/environment/getModule',
                 param:{
                 }
             }

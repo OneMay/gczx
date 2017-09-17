@@ -25,9 +25,9 @@ export const store = new Vuex.Store({
     actions: {
         //类似于mutations，但它提交的是mutation,而不是直接更改状态，还可以包含任意异步操作
         change(context, payload) {
-            setTimeout(function() {
-                context.commit('setData', payload)
-            }, 1000)
+            // setTimeout(function() {
+            context.commit('setData', payload)
+                // }, 1000)
         }
     }
 });
