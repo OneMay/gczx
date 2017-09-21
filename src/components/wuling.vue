@@ -211,21 +211,35 @@ export default {
             this.option.geo.width = '100%';
             this.option.geo.height = '100%';
             //this.getMapName(param.name);
-            if (param.name == '鹤峰县') {
+            var NoteData=[];
+            this.placeList.forEach(function(val,index){
+                if(param.name==val.Note){
+                    NoteData.push({
+                        name:val.baseName,
+                        value:[val.longitudePosition,val.latitudePosition]
+                    })
+                }
+            })
+             if(this.count>1){
                 Object.assign(this.option.series[0], {
-                    data: [{
-                        name: that.echartData[0].name,
-                        value: [110.1721, 29.84]
-                    }, {
-                        name: that.echartData[1].name,
-                        value: [110.3721, 29.94]
-                    },
-                    {
-                        name: that.echartData[2].name,
-                        value: [110.3021, 30.04]
-                    }]
+                    data: NoteData
                 })
             }
+            // if (param.name == '鹤峰县') {
+            //     Object.assign(this.option.series[0], {
+            //         data: [{
+            //             name: that.echartData[0].name,
+            //             value: [110.1721, 29.84]
+            //         }, {
+            //             name: that.echartData[1].name,
+            //             value: [110.3721, 29.94]
+            //         },
+            //         {
+            //             name: that.echartData[2].name,
+            //             value: [110.3021, 30.04]
+            //         }]
+            //     })
+            // }
             this.myChart.hideLoading();
             // this.option.series[0].data.push({tooltip:{formatter:'{b}'}})
             this.myChart.setOption(this.option, true);
@@ -256,6 +270,7 @@ export default {
                 this.option.geo.width = '100%';
                 this.option.geo.height = '100%';
                 this.getMapName('武陵山')
+            
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '鹤峰县',
@@ -263,21 +278,35 @@ export default {
                     }]
                 })
             }
-            if (this.option.geo.map == '鹤峰县') {
+            var NoteData=[];
+            this.placeList.forEach(function(val,index){
+                if(param.name==val.Note){
+                    NoteData.push({
+                        name:val.baseName,
+                        value:[val.longitudePosition,val.latitudePosition]
+                    })
+                }
+            })
+            if(this.count>1){
                 Object.assign(this.option.series[0], {
-                    data: [{
-                        name: that.echartData[0].name,
-                        value: [110.1721, 29.84]
-                    }, {
-                        name: that.echartData[1].name,
-                        value: [110.3721, 29.94]
-                    },
-                    {
-                        name: that.echartData[2].name,
-                        value: [110.3021, 30.04]
-                    }]
+                    data: NoteData
                 })
             }
+            // if (this.option.geo.map == '鹤峰县') {
+            //     Object.assign(this.option.series[0], {
+            //         data: [{
+            //             name: that.echartData[0].name,
+            //             value: [110.1721, 29.84]
+            //         }, {
+            //             name: that.echartData[1].name,
+            //             value: [110.3721, 29.94]
+            //         },
+            //         {
+            //             name: that.echartData[2].name,
+            //             value: [110.3021, 30.04]
+            //         }]
+            //     })
+            // }
 
             this.myChart.hideLoading();
             this.myChart.setOption(this.option);
@@ -367,6 +396,7 @@ export default {
                 var dataList= data.contents.list;
                 dataList.forEach(function(val,index){
                     that.placeList.push({
+                        Note:val.Note,
                        baseName:val.baseName,
                        baseNo:val.baseNo,
                        companyNo:2,
