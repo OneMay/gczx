@@ -4,6 +4,8 @@
        
     </div> 
      <button class="md-close btn-sm btn-primary" @click="returnClick">返回</button>
+     <span class="md-close btn-sm btn-primary" id="map1" @click="chooseMapColor(1)">主题1</span>
+     <span class="md-close btn-sm btn-primary" id="map2" @click="chooseMapColor(2)">主题2</span>
     </div>
     
 </template>
@@ -23,7 +25,8 @@ export default {
                 show:'',
                 name:'',
                 arr:[],
-                from:''
+                from:'',
+                mapColor:null
             },
             geoCoordMap: {
 
@@ -34,7 +37,10 @@ export default {
             option: {
                 title: {
                     text: '武陵山地区分布图',
-                    left: 'left'
+                    left: 'left',
+                    textStyle: {
+                        color: '#fff'
+                    }
                 },
                 tooltip: {
                     trigger: 'item'
@@ -53,7 +59,10 @@ export default {
                     map: '武陵山',
                     label: {
                         normal: {
-                            show: true
+                            show: true,
+                            textStyle: {
+                                color: '#fff'
+                            }
                         },
                         emphasis: {
                             show: true,
@@ -112,6 +121,9 @@ export default {
                     data: [{
                         name: '鹤峰县',
                         value: [110.1721, 29.84]
+                    },{
+                        name:'咸丰县',
+                        value:[109.1500,29.6802]
                     }]
                 }]
             },
@@ -119,7 +131,9 @@ export default {
             count: 1,
             num:1,
             placeList:[],
-            echartData:[]
+            echartData:[],
+            mapColor:1,
+            placeListArr:[]
         }
     },
     props:['setName'],
@@ -170,22 +184,16 @@ export default {
                    var data={}
                    var paramName=param.name.toString();
 
-                   if(paramName=="百鸟村茶园"){
-                       data.baseNo='BN001';
-                       data.companyNo=2;
-                       data.traceCode='9693256390009800000000010'
-
-                   }
-
-                   if(paramName=="桃园基地"){
-                       data.baseNo='TY001';
-                       data.companyNo=2;
-                       data.traceCode='969704861327040000000001X'
+                   var num=this.placeListArr.indexOf(paramName);
+                   if(num>=0){
+                     data.baseNo= this.placeList[num].baseNo;
+                     data.companyNo=2;
+                    data.baseName=this.placeList[num].baseName
                    }
 
                    //this.$store.dispatch('change',data)
                    //console.log(this.$store.getters.getData);
-                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.traceCode);
+                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.baseName);
                     return
                 }
                 if(count>=2){
@@ -195,6 +203,7 @@ export default {
                         this.msg.name=param.name;
                         this.msg.arr=this.name;
                         this.msg.from='wuling';
+                        this.msg.mapColor=this.mapColor;
                         //alert(param.name)
                        this.$emit('tellToGeol',this.msg); 
                     }
@@ -255,7 +264,7 @@ export default {
             if (this.name.length > 0 ) {
                 var i = this.name.length - 1;
                 var path = this.name[i];
-                this.option.title.text = path + "分布图"
+                this.option.title.text = path + "地区分布图"
                 this.option.geo.map = path;
                 this.option.geo.width = '100%';
                 this.option.geo.height = '100%';
@@ -275,6 +284,9 @@ export default {
                     data: [{
                         name: '鹤峰县',
                         value: [110.1721, 29.84]
+                    },{
+                        name:'咸丰县',
+                        value:[109.1500,29.6802]
                     }]
                 })
             }
@@ -318,22 +330,103 @@ export default {
            mapNameObj.forEach(function(val,index){
                that.mapName.push(val.properties.name)
            })
-           this.setMapColor(); 
+           this.setMapColor(this.mapColor); 
         },
-        setMapColor(){
+        setMapColor(num){
             this.option.geo.regions=[];
             var that = this;
-            this.mapName.forEach(function(val,index){
-                that.option.geo.regions.push({
-                    name:val,
+            if(num==1){
+                this.option.geo.itemStyle.normal.areaColor='rgba(0,0,0,0.3)';
+                this.mapName.forEach(function(val,index){
+                //console.log(val)
+                if(val=="鹤峰县"){
+                  that.option.geo.regions.push({
+                       name:val,
                     itemStyle: {
                         normal: {
-                            areaColor: 'rgba('+that.randomValue()+','+ that.randomValue()+','+that.randomValue()+','+ Math.random().toFixed(2)+')',
-                            color: 'red'
+                            areaColor: 'rgba(218,165,32,0.8)',
+                            color: 'red',
+                            "borderColor": "#fff",
+                             "borderWidth": 0.5
                         }
                     }
-                })
+                  })  
+                }
+                else if(val=="咸丰县"){
+                  that.option.geo.regions.push({
+                       name:val,
+                    itemStyle: {
+                        normal: {
+                            areaColor: 'rgba(128,128,0,0.8)',
+                            color: 'red',
+                            "borderColor": "#fff",
+                             "borderWidth": 0.5
+                        }
+                    }
+                  })   
+                }
+                else{
+                    that.option.geo.regions.push({
+                        name:val,
+                        itemStyle: {
+                            normal: {
+                               // areaColor: 'rgba('+that.randomValue()+','+ that.randomValue()+','+that.randomValue()+','+ Math.random().toFixed(2)+')',
+                                areaColor:'rgba(0,0,0,0.3)',
+                                color: 'red',
+                                "borderColor": "#fff",
+                                "borderWidth": 0.5
+                            }
+                        }
+                    })
+                }
             })
+            }else{
+                this.option.geo.itemStyle.normal.areaColor='rgba(3,169,244,0.8)';
+                this.mapName.forEach(function(val,index){
+                //console.log(val)
+                if(val=="鹤峰县"){
+                    
+                  that.option.geo.regions.push({
+                       name:val,
+                    itemStyle: {
+                        normal: {
+                            areaColor: 'rgba(243,66,53,0.8)',
+                            color: 'red',
+                            "borderColor": "#fff",
+                             "borderWidth": 0.5
+                        }
+                    }
+                  })  
+                }
+                else if(val=="咸丰县"){
+                  that.option.geo.regions.push({
+                       name:val,
+                    itemStyle: {
+                        normal: {
+                            areaColor: 'rgba(255,87,34,0.8)',
+                            color: 'red',
+                            "borderColor": "#fff",
+                             "borderWidth": 0.5
+                        }
+                    }
+                  })   
+                }
+                else{
+                    that.option.geo.regions.push({
+                        name:val,
+                        itemStyle: {
+                            normal: {
+                               // areaColor: 'rgba('+that.randomValue()+','+ that.randomValue()+','+that.randomValue()+','+ Math.random().toFixed(2)+')',
+                                areaColor:'rgba(3,169,244,0.8)',
+                                color: 'red',
+                                "borderColor": "#fff",
+                                "borderWidth": 0.5
+                            }
+                        }
+                    })
+                }
+            })
+            }
         },
         drawGraph(id) {
             var that = this;
@@ -360,14 +453,14 @@ export default {
         //         that.returnClick();
         //     });
 
-            if(this.setName.name){     
+            if(this.setName.name){
+                this.mapColor=this.setName.mapColor;     
                 this.getMapName(this.setName.name);
                 this.count=2;
                 this.name=this.setName.map;
                 this.option.geo.map = this.setName.name;
                  this.chartClick(this.setName)
-                 this.setName.name=''; 
-                
+                 this.setName.name='';     
             }else{
                 this.getMapName('武陵山');
                 //this.option.geo.map == '安徽'
@@ -380,6 +473,8 @@ export default {
         },
          getPosition(){
              var that=this;
+             $('body').removeClass('bodyJpg');
+             $('body').addClass('bodyJpg');
             let params={
                 api:'http://localhost:8088/getPosition/api/1.0/ll/enterprise/environment/getModule',
                 param:{
@@ -403,6 +498,7 @@ export default {
                        latitudePosition:val.latitudePosition,
                        longitudePosition:val.longitudePosition
                     })
+                    that.placeListArr.push(val.baseName);
                 })
                 //alert( that.placeList)
                 that.drawGraph('echarts');
@@ -412,6 +508,13 @@ export default {
                 console.log(err)
                 that.drawGraph('echarts');
             })
+        },
+        chooseMapColor(num){
+            this.mapColor=num;
+            this.myChart.showLoading();
+            this.getMapName(this.option.geo.map);
+            this.myChart.hideLoading();
+            this.myChart.setOption(this.option, true);
         }
     },
     mounted() {
@@ -434,5 +537,17 @@ button.md-close.btn-sm.btn-primary {
     /* margin: auto; */
     /* display: inline; */
     /* text-align: center; */
+}
+#map1{
+ position: fixed;
+    top: 50px;
+    left: 20px;
+    cursor: pointer;
+}
+#map2{
+ position: fixed;
+    top: 50px;
+    left: 75px;
+    cursor: pointer;
 }
 </style>

@@ -9,12 +9,12 @@
                            <!-- <div v-for="item in items">
                                 <div v-html="item.dom"></div>
                            </div> -->
-                            <li data-index="1"  class="search-item cater-item" v-for="item in items" :coordinate="item.baseName+':'+'['+item.latitudePosition+','+item.longitudePosition+']'" @click="toCoordinate(110.42038, 29.82622)">
+                            <li data-index="1"  class="search-item cater-item" v-for="item in items" :coordinate="item.baseName+':'+'['+item.longitudePosition+','+item.latitudePosition+']'" @click="toCoordinate(item.longitudePosition , item.latitudePosition)">
                                 <div class="cf mb_5">
                                     <div class="col-r">
                                         <div class="img-wrap">
                                             <a href="javascript:void(0)" data-index="1"  >
-                                                <img src="http://webmap3.map.bdimg.com/maps/services/thumbnails?width=132&amp;height=104&amp;align=center,center&amp;quality=100&amp;src=http%3A%2F%2Fe.hiphotos.baidu.com%2Fbainuo%2Fcrop%253D0%252C0%252C470%252C285%253Bw%253D470%253Bq%253D99%253Bc%253Dnuomi%252C95%252C95%2Fsign%3D3022ca49be99a9012f7a017620a5264b%2F023b5bb5c9ea15ce19c1f654b0003af33a87b2bb.jpg" style="width:71px;height:58px;"> </a>
+                                                <img src="./../../static/img/shebei.jpg" style="width:71px;height:58px;"> </a>
                                         </div>
                                     </div>
                                     <div class="ml_30 mr_85">
@@ -22,12 +22,12 @@
                                             <span>
                                                 <a href="javascript:void(0)" class="n-blue" data-index="1" v-text="item.baseName"></a>
                                             </span>
-                                            <span class="n-grey addr" title="解放路257号">解放路257号</span>
+                                            <span class="n-grey addr" title=""></span>
                                         </div>
                                     </div>
                                 </div>
                             </li>
-                            <button type="button" class="btn  btn-xs" @click="setToGeo">返回</button>
+                            <button type="button" class="btn  btn-sm btn-primary" @click="setToGeo">返回</button>
                         </ul>
                     </div>
                 </li>
@@ -53,13 +53,8 @@ export default {
             },
             items:[],
             placeList:[],
-            data: [
-                { name: '桃园基地', value: 194 },
-                { name: '桃园基地', value: 229 },
-                { name: '武汉', value: 273 },
-                { name: '桃园基地', value: 279 },
-                {name:'百鸟村茶园',value:220}
-            ],
+            placeListArr:[],
+            data: [],
             geoCoordMap: {
                
                 '桃园基地': [115.480656, 35.23375],
@@ -156,12 +151,12 @@ export default {
                 //             }
                 //         },
                 {
-                    name: 'Top 5',
+                    name: ' ',
                     type: 'effectScatter',
                     coordinateSystem: 'bmap',
                     data: this.convertData(that.data.sort(function (a, b) {
                         return b.value - a.value;
-                    }).slice(0, 6)),
+                    }).slice(0, 600)),
                     symbolSize: function (val) {
                         return val[2] / 10;
                     },
@@ -179,7 +174,7 @@ export default {
                     },
                     itemStyle: {
                         normal: {
-                            color: '#f4e925',
+                            color: 'red',
                             shadowBlur: 10,
                             shadowColor: '#333'
                         }
@@ -204,7 +199,7 @@ export default {
                 //bmap.panTo(new BMap.Point(e.point.lng,e.point.lat));// map.panTo方法，把点击的点设置为地图中心点  
                  bmap.centerAndZoom(new BMap.Point(e.point.lng,e.point.lat),zoom)
             });
-            this.toCoordinate(110.42038, 29.82622); 
+            this.toCoordinate(this.items[0].longitudePosition, this.items[0].latitudePosition); 
         },
         toCoordinate(longitude,latitude){
             var bmap = this.chart.getModel().getComponent('bmap').getBMap();
@@ -216,23 +211,16 @@ export default {
         chartClick(param){
              var data={}
                    var paramName=param.name.toString();
-
-                   if(paramName=="百鸟村茶园"){
-                       data.baseNo='BN001';
-                       data.companyNo=2;
-                       data.traceCode='9693256390009800000000010'
-
+                   var num=this.placeListArr.indexOf(paramName);
+                   if(num>=0){
+                     data.baseNo= this.placeList[num].baseNo;
+                     data.companyNo=2;
+                    data.baseName=this.placeList[num].baseName
                    }
-
-                   if(paramName=="桃园基地"){
-                       data.baseNo='TY001';
-                       data.companyNo=2;
-                       data.traceCode='969704861327040000000001X'
-                   }
-
+                   
                    //this.$store.dispatch('change',data)
                    //console.log(this.$store.getters.getData);
-                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.traceCode);
+                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.baseName);
         },
         setToGeo(){
              this.msg.show='geo';
@@ -255,6 +243,7 @@ export default {
                     data=JSON.parse(res.data)
                 }
                 var dataList= data.contents.list;
+                var value=100;
                 dataList.forEach(function(val,index){
                     that.placeList.push({
                        baseName:val.baseName,
@@ -268,22 +257,26 @@ export default {
                         latitudePosition:val.latitudePosition,
                         longitudePosition:val.longitudePosition
                     })
-                            
+                    that.placeListArr.push(val.baseName);
+                     that.data.push({
+                        name:val.baseName,
+                        value:++value
+                    }) 
+                    that.geoCoordMap[val.baseName]=[val.longitudePosition,val.latitudePosition];
+                    // Object.assign(that.geoCoordMap, {
+                    //     val.baseName:[val.longitudePosition,val.latitudePosition]
+                    // })     
                 })
-              
-                //alert( that.placeList)
-                //console.log(that.placeList)
-                
+              this.drawGraph('echart');
             })
             .catch(err=>{
                 console.log(err)
-                that.drawGraph('echarts');
+                that.drawGraph('echart');
             })
         }
     },
     mounted() {
         this.$nextTick(function () {
-            this.drawGraph('echart');
             this.getPosition();
         })
     },
@@ -314,6 +307,8 @@ export default {
 .box {
     width: 368px;
     position: relative;
+    height: 500px;
+    overflow-y: scroll;
 }
 
 .box .card {

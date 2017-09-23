@@ -19,7 +19,7 @@ import geo from './components/geo'
 import bmap from './components/bmap'
 import wuling from './components/wuling'
 import './../static/css/lib/bootstrap.css'
-import './../static/css/lib/component.css'
+// import './../static/css/lib/component.css'
 //import './../../static/js/lib/modalEffects.js'
 import AXIOS from './axios/axios'
 const Axios = new AXIOS();
@@ -33,12 +33,14 @@ export default {
             name:{
                 name:'',
                 map:[],
-                from:''
+                from:'',
+                mapColor:null
             },
             toName:{
                 name:'',
                 map:[],
-                from:''
+                from:'',
+                mapColor:null
             }
         }
     },
@@ -61,15 +63,19 @@ export default {
             this.toName.name=msg.name;
              this.toName.map=msg.arr;
              this.toName.from=msg.from;
+             this.toName.mapColor=msg.mapColor;
         },
         getToBmap(msg){
             //alert(msg);
             this.name.name=this.toName.name;
              this.name.map=this.toName.map;
              this.name.from=this.toName.from;
+             this.name.mapColor=this.toName.mapColor;
+ 
             this.toName.name='';
             this.toName.map=[];
             this.toName.from='';
+            this.toName.mapColor=null;
             if(this.name.from=='geo'){
                 this.show='geo';
             }else{

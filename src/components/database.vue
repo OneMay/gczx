@@ -284,23 +284,20 @@ export default {
             //alert(window.location.hash);
             //console.log(this.$store.getters.getData);
             var that=this;
+            $('body').removeClass('bodyJpg');
             function set(){
-                var query = location.search.substring(1);
+                var query = decodeURI(location.search.substring(1));
                 // var queryStr=query.replace(/=/g,':');
                     var values= query.split("&");
                     var data={
                         baseNo:values[0],
                         companyNo:2,
-                        traceCode:values[1]
+                        baseName:values[1]
                     }
                     that.$store.dispatch('change',data);
                 var positionData=that.$store.getters.getData;
-                if(positionData.baseNo=='BN001'){
-                    that.placeName='百鸟村茶园环境数据'
-                }
-                if(positionData.baseNo=='TY001'){
-                    that.placeName='桃园基地环境数据'
-                }
+        
+                that.placeName=values[1]+'环境数据';
             }
             set();
             

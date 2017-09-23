@@ -6,8 +6,9 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
     state: {
         baseNo: '',
-        companyNo: 2,
-        traceCode: ''
+        baseName: '',
+        companyNo: 2
+            //traceCode: ''
     },
     getters: {
         getData(state) {
@@ -19,7 +20,8 @@ export const store = new Vuex.Store({
         setData(state, payload) {
             state.baseNo = payload.baseNo;
             state.companyNo = payload.companyNo;
-            state.traceCode = payload.traceCode;
+            //state.traceCode = payload.traceCode;
+            state.baseName = payload.baseName;
         }
     },
     actions: {
