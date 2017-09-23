@@ -12,6 +12,19 @@ body {
     font-family: 'Microsoft YaHei';
 }
 
+.bodyJpg {
+    /* background: url(app/img/violate.jpg); */
+    background: url(./../../img/navbg_01.jpeg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    color: white;
+}
+
 li {
     list-style: none;
 }

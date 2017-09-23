@@ -280,7 +280,7 @@ export default {
             }
             var NoteData=[];
             this.placeList.forEach(function(val,index){
-                if(param.name==val.Note){
+                if(that.option.geo.map==val.Note){
                     NoteData.push({
                         name:val.baseName,
                         value:[val.longitudePosition,val.latitudePosition]
