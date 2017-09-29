@@ -36,7 +36,7 @@ const url = 'getenvironment';
                         }
                     },
                     toolbox: {
-                        show: true,
+                        show: false,
                         feature: {
                             /*dataZoom: {
                                 yAxisIndex: 'none'
@@ -297,7 +297,7 @@ const url = 'getenvironment';
                     }else{
                         data=JSON.parse(res.data)
                     }
-                    this.myecharts.showLoading();
+                    
                     //console.log(data.temparatureInfo[0].staticTemperatureInfo.datas)
                     if(data.contents.list&&data.contents.list.length>0){
                         var dataList= data.contents.list;
@@ -372,13 +372,6 @@ const url = 'getenvironment';
                     }else{
                         this.option.legend.data=[];
                         this.option.series=[];
-                        this.myecharts.showLoading({
-                            text : '暂无24小时气温数据',
-                            effect : 'bubble',
-                            textStyle : {
-                                fontSize : 30
-                            }
-                        });
                         this.getNot='暂无24小时气温数据';
                         this.myecharts.hideLoading();
                          this.myecharts.setOption(this.option, true);
@@ -412,7 +405,7 @@ const url = 'getenvironment';
                     }else{
                         data=JSON.parse(res.data)
                     }
-                     this.myecharts.showLoading();
+                    
                     //console.log(data)
                     var dataList=data.contents.list;
                     var MaxDatas=[],MinDatas=[],averageDatas=[];
