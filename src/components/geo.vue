@@ -260,7 +260,20 @@ export default {
             this.option.geo.width = '80%';
             this.option.geo.height = '90%';
             //this.getMapName(param.name);
-            
+            var NoteData=[];
+            this.placeList.forEach(function(val,index){
+                if(param.name==val.Note){
+                    NoteData.push({
+                        name:val.baseName,
+                        value:[val.longitudePosition,val.latitudePosition]
+                    })
+                }
+            })
+             if(this.count>3){
+                Object.assign(this.option.series[0], {
+                    data: NoteData
+                })
+            }
             if (param.name == '湖北') {
                 Object.assign(this.option.series[0], {
                     data: [{
@@ -294,22 +307,7 @@ export default {
                 })
                 //that.option.tooltip.formatter='基地数：3';
             }
-            if (param.name == '鹤峰县') {
-                Object.assign(this.option.series[0], {
-                    data: [{
-                        name: that.echartData[0].name,
-                        value: [110.1721, 29.84]
-                    }, {
-                        name: that.echartData[1].name,
-                        value: [110.3721, 29.94]
-                    },
-                    {
-                        name: that.echartData[2].name,
-                        value: [110.3021, 30.04]
-                    }]
-                })
-                //that.option.tooltip.formatter='{b}: {c}';
-            }
+           
             if (param.name == '武汉市') {
                 Object.assign(this.option.series[0], {
                     data: [{
@@ -371,6 +369,20 @@ export default {
                 })
                 //that.option.tooltip.formatter='基地数：4';
             }
+            var NoteData=[];
+            this.placeList.forEach(function(val,index){
+                if(that.option.geo.map==val.Note){
+                    NoteData.push({
+                        name:val.baseName,
+                        value:[val.longitudePosition,val.latitudePosition]
+                    })
+                }
+            })
+             if(this.count>3){
+                Object.assign(this.option.series[0], {
+                    data: NoteData
+                })
+            }
             if (this.option.geo.map == '湖北') {
                 Object.assign(this.option.series[0], {
                     data: [{
@@ -405,22 +417,7 @@ export default {
                 })
                 //that.option.tooltip.formatter='基地数：2';
             }
-            if (this.option.geo.map == '鹤峰县') {
-               Object.assign(this.option.series[0], {
-                    data: [{
-                        name: that.echartData[0].name,
-                        value: [110.1721, 29.84]
-                    }, {
-                        name: that.echartData[1].name,
-                        value: [110.3721, 29.94]
-                    },
-                    {
-                        name: that.echartData[2].name,
-                        value: [110.3021, 30.04]
-                    }]
-                })
-                //that.option.tooltip.formatter='{b}:{c}';
-            }
+           
             if (this.option.geo.map == '武汉市') {
                 Object.assign(this.option.series[0], {
                     data: [{
@@ -672,7 +669,7 @@ export default {
              $('body').removeClass('bodyJpg');
              $('body').addClass('bodyJpg');
             let params={
-                api:'http://localhost:8088/getPosition/api/1.0/ll/enterprise/environment/getModule',
+                api:'getPosition/api/1.0/ll/enterprise/environment/getModule',
                 param:{
                 }
             }
@@ -687,6 +684,7 @@ export default {
                 var dataList= data.contents.list;
                 dataList.forEach(function(val,index){
                     that.placeList.push({
+                        Note:val.Note,
                        baseName:val.baseName,
                        baseNo:val.baseNo,
                        companyNo:2,

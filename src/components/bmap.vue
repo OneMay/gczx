@@ -230,7 +230,7 @@ export default {
         getPosition(){
              var that=this;
             let params={
-                api:'http://localhost:8088/getPosition/api/1.0/ll/enterprise/environment/getModule',
+                api:'getPosition/api/1.0/ll/enterprise/environment/getModule',
                 param:{
                 }
             }

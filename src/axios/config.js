@@ -5,7 +5,7 @@ import Qs from 'qs'
 export default {
     url: '/get',
 
-    baseURL: 'http://....',
+    baseURL: 'http://localhost:8088/',
     method: 'POST' || 'GET',
 
     transformRequest: [

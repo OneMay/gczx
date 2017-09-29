@@ -1,19 +1,29 @@
 <template>
-    <div id="temperature" :style="{width:'1200px',height:'400px'}"></div>
+    <div class="data">
+        <div id="temperature" :style="{width:'1200px',height:'400px'}"></div>
+        <div class="getno" v-text="getNot"></div>
+    </div>
 </template>
 
 <script>
     import echarts from 'echarts'
     import AXIOS from './../../axios/axios'
     const Axios = new AXIOS();
-const url = 'http://localhost:8088/getenvironment';
+const url = 'getenvironment';
     export default {
         name:'temperature',
         data(){
             return {
+                getNot:"",
                 option : {
                     title: {
-                        text: ''
+                        text: '',
+                        subtext:'',
+                        subtextStyle:{
+                            color:'red',
+                            align:'center',
+                            verticalAlign:'middle'
+                        }
                     },
                     tooltip: {
                         trigger: 'axis'
@@ -79,15 +89,15 @@ const url = 'http://localhost:8088/getenvironment';
                 var hour = this.getenvir.hours;
                 this.myecharts.showLoading();
                 if(num==0){
-                    // if(year!=this.today.year||month!=this.today.month||day!=this.today.day)
-                    // {
-                    //     hour=23
-                    // }
-                    // while(hour>=0){
-                    //     this.option.xAxis.data.push(hour+':00');
-                    //     hour--;
-                    // }
-                    this.option.xAxis.data=[];
+                    if(year!=this.today.year||month!=this.today.month||day!=this.today.day)
+                    {
+                        hour=23
+                    }
+                    while(hour>=0){
+                        this.option.xAxis.data.push(hour+':00');
+                        hour--;
+                    }
+                    this.option.xAxis.data=this.option.xAxis.data.reverse();
                     var date=year+'-'+month+'-'+day;
                     this.getData(date,1);
                 }
@@ -226,8 +236,21 @@ const url = 'http://localhost:8088/getenvironment';
                 this.getenvir.year=year;
                 this.getenvir.month=month;
                 this.getenvir.day=day;
+                this.myecharts.on("mouseover", (param)=>{
+                    if(param.name&&param.name=='平均值'){
+                        this.option.tooltip.trigger='item';
+                        this.myecharts.setOption(this.option, true);
+                    }else{
+                        this.option.tooltip.trigger='axis';
+                        this.myecharts.setOption(this.option, true);
+                    }
+                });
+                this.myecharts.on("mouseout", (param)=>{
+     
+                    this.option.tooltip.trigger='axis';
+                    this.myecharts.setOption(this.option, true);
+                });
                 this.setData(year,month,day,7);
-                
             },
         getData(dates,n){
             this.myecharts.showLoading();
@@ -276,16 +299,16 @@ const url = 'http://localhost:8088/getenvironment';
                     }
                     this.myecharts.showLoading();
                     //console.log(data.temparatureInfo[0].staticTemperatureInfo.datas)
-                    if(data.contents.list.length>0){
+                    if(data.contents.list&&data.contents.list.length>0){
                         var dataList= data.contents.list;
-                        var datas=[];
+                        var datas1=[],datas2=[];
                         var hourTime=[]
                         dataList.forEach(function(val,index){
                             var time =parseInt(val.measureTime)*1000; 
                             var measureTime=new Date(time);    
                             //console.log(formatDate(measureTime));
                            // console.log(val.measureItemData);
-                            datas.push(val.measureItemData)
+                            datas1.push(val.measureItemData)
                             hourTime.push(formatDate(measureTime));
                         })
                          function formatDate(now)   {     
@@ -304,13 +327,25 @@ const url = 'http://localhost:8088/getenvironment';
                             hour=hour+':00';     
                             return   hour;     
                         }
-                        this.option.xAxis.data=hourTime;
+                        for(var i = 0;i<hourTime.length;i++){
+                            var num = this.option.xAxis.data.indexOf(hourTime[i]);
+                            if(num>=0){
+                                datas2[num]=datas1[i]
+                            }
+                        }
+                        for(var j=0;j<this.option.xAxis.data.length;j++){
+                            if(datas2[j]==undefined){
+                                datas2[j]='';
+                            }
+                        }
+                        
+                        //this.option.xAxis.data=hourTime;
                         this.option.legend.data=['气温'];
                         this.option.series=[];
                         this.option.series=[{
                             name:'气温',
                             type:'line',
-                            data:datas,
+                            data:datas2,
                             markPoint:{
                                 data: [
                                     {type: 'max', name: '最大值'},
@@ -331,6 +366,7 @@ const url = 'http://localhost:8088/getenvironment';
                                  animation:true
                             }
                         }]
+                        this.getNot='';
                         this.myecharts.hideLoading();
                          this.myecharts.setOption(this.option, true);
                     }else{
@@ -343,7 +379,8 @@ const url = 'http://localhost:8088/getenvironment';
                                 fontSize : 30
                             }
                         });
-                        //this.myecharts.hideLoading();
+                        this.getNot='暂无24小时气温数据';
+                        this.myecharts.hideLoading();
                          this.myecharts.setOption(this.option, true);
                     }
                 })
@@ -384,7 +421,7 @@ const url = 'http://localhost:8088/getenvironment';
                         MinDatas.push(val.minData);
                         averageDatas.push(val.avgData);
                     });
-                    
+                    this.getNot='';
                     this.option.legend.data=['最高气温','平均气温','最低气温']
                     this.option.series=[ {
                             name:'最高气温',
@@ -486,5 +523,12 @@ const url = 'http://localhost:8088/getenvironment';
 <style>
 span{
     margin-bottom: 0px !important;
+}
+.getno{
+    position:absolute;
+    top:370px;
+    left:50%;
+    color:red;
+    font-size: 20px;
 }
 </style>

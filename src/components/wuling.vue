@@ -217,8 +217,8 @@ export default {
             this.myChart.showLoading();
             this.option.title.text = param.name + "分布图"
             this.option.geo.map = param.name;
-            this.option.geo.width = '100%';
-            this.option.geo.height = '100%';
+            this.option.geo.width = '80%';
+            this.option.geo.height = '90%';
             //this.getMapName(param.name);
             var NoteData=[];
             this.placeList.forEach(function(val,index){
@@ -264,17 +264,17 @@ export default {
             if (this.name.length > 0 ) {
                 var i = this.name.length - 1;
                 var path = this.name[i];
-                this.option.title.text = path + "地区分布图"
+                this.option.title.text = path + "分布图"
                 this.option.geo.map = path;
-                this.option.geo.width = '100%';
-                this.option.geo.height = '100%';
+                this.option.geo.width = '80%';
+                this.option.geo.height = '90%';
                 this.name.length--;
                 this.getMapName(path);
             }
             if (this.name.length <= 0) {
                 this.name.length = 0;
                 this.count = 1;
-                this.option.title.text = "武陵山分布图"
+                this.option.title.text = "武陵山地区分布图"
                 this.option.geo.map = '武陵山';
                 this.option.geo.width = '100%';
                 this.option.geo.height = '100%';
@@ -476,7 +476,7 @@ export default {
              $('body').removeClass('bodyJpg');
              $('body').addClass('bodyJpg');
             let params={
-                api:'http://localhost:8088/getPosition/api/1.0/ll/enterprise/environment/getModule',
+                api:'getPosition/api/1.0/ll/enterprise/environment/getModule',
                 param:{
                 }
             }
