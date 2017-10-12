@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="clearfix" :style="{width:'1203px',margin:'0 auto'}">
+        <div class="clearfix" :style="{width:'1203px'}">
             <div class="environment">
                 <div class="charts">
                     <h2 class="tea-Data" v-text="placeName">环境数据</h2>
@@ -405,10 +405,19 @@ button.btn.btn-danger.btn-xs.horizon2 {
 .environment {
     margin: 20px auto;
 }
+.tab-content {
+    margin-top: 20px;
+}
 .tea-Data{
     text-align:center;
     border-bottom:1px solid #ddd;
-    margin: 0;
+    margin: 20px;
     padding:10px;
+}
+.clearfix{
+     position: relative;
+    left: 50%;
+    margin-left: -601.5px;
+    bottom: 30px;
 }
 </style>
