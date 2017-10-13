@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <div>
         <div class="clearfix" :style="{width:'1203px'}">
             <div class="environment">
@@ -403,7 +403,7 @@ button.btn.btn-danger.btn-xs.horizon2 {
 }
 
 .environment {
-    margin: 20px auto;
+    margin: 35px auto;
 }
 .tab-content {
     margin-top: 20px;
@@ -418,6 +418,6 @@ button.btn.btn-danger.btn-xs.horizon2 {
      position: relative;
     left: 50%;
     margin-left: -601.5px;
-    bottom: 30px;
+    /*bottom: 30px;*/
 }
 </style>
