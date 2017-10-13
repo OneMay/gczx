@@ -48,7 +48,7 @@ import 'echarts/map/js/province/yunnan.js'
 import 'echarts/map/js/province/zhejiang.js'
 import 'echarts/map/js/china.js'
 import 'echarts/map/js/china-contour.js'
-import './../../static/js/page/index.js'
+// import './../../static/js/page/index.js'
 import AXIOS from './../axios/axios'
 const Axios = new AXIOS();
 export default {
@@ -111,8 +111,8 @@ export default {
                         }
                     },
                     roam: true,
-                    width: '100%',
-                    height:'100%',
+                    // width: '100%',
+                    // height:'100%',
                     itemStyle: {
                         normal: {
                              areaColor:'rgba(0,0,0,0.3)',
@@ -206,6 +206,14 @@ export default {
             if (param.name== '南海诸岛') {
                     return ;
                 }
+
+            if(this.count>=2&&paramName.indexOf(param.name)<0){
+                    var geopath=`./../../static/map/js/${ param.name}.js`;
+                    if(require(`./../../static/map/js/${ param.name}.js`)){
+                       // console.log(geopath);
+                    　　require(`./../../static/map/js/${ param.name}.js`);
+                    }        
+                }
             //alert(param.name);
             if (this.option.geo.map&&this.option.geo.map!=param.name&&paramName.indexOf(param.name)<0) {
                 ++this.count;
@@ -233,7 +241,7 @@ export default {
 
                    //this.$store.dispatch('change',data)
                    //console.log(this.$store.getters.getData);
-                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.baseName);
+                  window.open('/environment?'+data.baseNo+'&'+data.baseName);
                     return
                 }
                 if(count>=5){
@@ -250,6 +258,7 @@ export default {
                 }
             }
             else{
+
                 this.num=1;
                 this.getMapName(param.name);
                 
@@ -257,8 +266,8 @@ export default {
             this.myChart.showLoading();
             this.option.title.text = param.name + "分布图"
             this.option.geo.map = param.name;
-            this.option.geo.width = '80%';
-            this.option.geo.height = '90%';
+            // this.option.geo.width = '80%';
+            // this.option.geo.height = '90%';
             //this.getMapName(param.name);
             var NoteData=[];
             this.placeList.forEach(function(val,index){
@@ -274,7 +283,7 @@ export default {
                     data: NoteData
                 })
             }
-            if (param.name == '湖北') {
+            else if (param.name == '湖北') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '恩施土家族苗族自治州',
@@ -286,7 +295,7 @@ export default {
                 })
                 //that.option.tooltip.formatter='基地数：4';
             }
-            if (param.name == '辽宁') {
+            else if (param.name == '辽宁') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '丹东市',
@@ -295,7 +304,7 @@ export default {
                 })
                 //that.option.tooltip.formatter='基地数：4';
             }
-            if (param.name == '恩施土家族苗族自治州') {
+            else if (param.name == '恩施土家族苗族自治州') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '鹤峰县',
@@ -308,7 +317,7 @@ export default {
                 //that.option.tooltip.formatter='基地数：3';
             }
            
-            if (param.name == '武汉市') {
+            else if (param.name == '武汉市') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '洪山区',
@@ -318,7 +327,7 @@ export default {
                 //that.option.tooltip.formatter='基地数：3';
             }
             
-            if (param.name == '丹东市') {
+            else if (param.name == '丹东市') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '宽甸满族自治县',
@@ -326,6 +335,11 @@ export default {
                     }]
                 })
                 //that.option.tooltip.formatter='基地数：4';
+            }
+            else{
+                Object.assign(this.option.series[0], {
+                    data: []
+                })
             }
             this.myChart.hideLoading();
             // this.option.series[0].data.push({tooltip:{formatter:'{b}'}})
@@ -344,8 +358,8 @@ export default {
                 var path = this.name[i];
                 this.option.title.text = path + "分布图"
                 this.option.geo.map = path;
-                this.option.geo.width = '80%';
-                this.option.geo.height = '90%';
+                // this.option.geo.width = '80%';
+                // this.option.geo.height = '90%';
                 this.name.length--;
                 this.getMapName(path);
             }
@@ -354,8 +368,8 @@ export default {
                 this.count = 1;
                 this.option.title.text = "全国分布图"
                 this.option.geo.map = 'china';
-                this.option.geo.width = '100%';
-                this.option.geo.height = '100%';
+                // this.option.geo.width = '100%';
+                // this.option.geo.height = '100%';
                 this.getMapName('china')
                 Object.assign(this.option.series[0], {
                     data: [{
@@ -383,7 +397,19 @@ export default {
                     data: NoteData
                 })
             }
-            if (this.option.geo.map == '湖北') {
+            else if(this.option.geo.map == 'china'){
+                Object.assign(this.option.series[0], {
+                    data: [{
+                        name: '湖北',
+                        value: [112.199266,31.035516]
+                    },
+                    {
+                        name: '辽宁',
+                        value: [123.184876,41.281140]
+                    }]
+                })
+            }
+            else if (this.option.geo.map == '湖北') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '恩施土家族苗族自治州',
@@ -395,7 +421,7 @@ export default {
                 })
                 //that.option.tooltip.formatter='基地数：3';
             }
-            if (this.option.geo.map == '辽宁') {
+            else if (this.option.geo.map == '辽宁') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '丹东市',
@@ -405,7 +431,7 @@ export default {
                 //that.option.tooltip.formatter='基地数：4';
             }
 
-            if (this.option.geo.map == '恩施土家族苗族自治州') {
+            else if (this.option.geo.map == '恩施土家族苗族自治州') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '鹤峰县',
@@ -418,7 +444,7 @@ export default {
                 //that.option.tooltip.formatter='基地数：2';
             }
            
-            if (this.option.geo.map == '武汉市') {
+            else if (this.option.geo.map == '武汉市') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '洪山区',
@@ -427,7 +453,7 @@ export default {
                 })
             }
 
-            if (this.option.geo.map == '丹东市') {
+            else if (this.option.geo.map == '丹东市') {
                 Object.assign(this.option.series[0], {
                     data: [{
                         name: '宽甸满族自治县',
@@ -436,7 +462,11 @@ export default {
                 })
                 //that.option.tooltip.formatter='基地数：4';
             }
-
+            else{
+                Object.assign(this.option.series[0], {
+                    data: []
+                })
+            }
             this.myChart.hideLoading();
             this.myChart.setOption(this.option);
         },

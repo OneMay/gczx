@@ -1,6 +1,6 @@
 <template>
     <div class="map">
-       <div id="echarts" :style="{width:'1000px',height:'800px',margin:'20px auto'}">
+       <div id="echarts" :style="{width:'1200px',height:'1000px',margin:'20px auto'}">
        
     </div> 
      <button class="md-close btn-sm btn-primary" @click="returnClick">返回</button>
@@ -13,7 +13,7 @@
 <script>
 import echarts from 'echarts'
 import './../../static/map/wulingshan/wulingshan.js'
-import './../../static/js/page/index.js'
+// import './../../static/js/page/index.js'
 import AXIOS from './../axios/axios'
 const Axios = new AXIOS();
 export default {
@@ -73,8 +73,8 @@ export default {
                         }
                     },
                     roam: true,
-                    width: '100%',
-                    height:'100%',
+                    // width: '100%',
+                    // height:'100%',
                     itemStyle: {
                         normal: {
                             areaColor: '#323c48',
@@ -167,6 +167,13 @@ export default {
             })
            // console.log(paramName);
            // console.log(that.echartData[0].name);
+            if(this.count>=1&&paramName.indexOf(param.name)<0){
+                    var geopath=`./../../static/map/js/${ param.name}.js`;
+                    if(require(`./../../static/map/js/${ param.name}.js`)){
+                       // console.log(geopath);
+                    　　require(`./../../static/map/js/${ param.name}.js`);
+                    }        
+                }
             if (this.option.geo.map&&this.option.geo.map!=param.name&&paramName.indexOf(param.name)<0) {
                 ++this.count;
                 //alert(this.count);
@@ -193,7 +200,7 @@ export default {
 
                    //this.$store.dispatch('change',data)
                    //console.log(this.$store.getters.getData);
-                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.baseName);
+                  window.open('/environment?'+data.baseNo+'&'+data.baseName);
                     return
                 }
                 if(count>=2){
@@ -217,8 +224,8 @@ export default {
             this.myChart.showLoading();
             this.option.title.text = param.name + "分布图"
             this.option.geo.map = param.name;
-            this.option.geo.width = '80%';
-            this.option.geo.height = '90%';
+            // this.option.geo.width = '80%';
+            // this.option.geo.height = '90%';
             //this.getMapName(param.name);
             var NoteData=[];
             this.placeList.forEach(function(val,index){
@@ -232,6 +239,10 @@ export default {
              if(this.count>1){
                 Object.assign(this.option.series[0], {
                     data: NoteData
+                })
+            }else{
+                Object.assign(this.option.series[0], {
+                    data: []
                 })
             }
             // if (param.name == '鹤峰县') {
@@ -266,8 +277,8 @@ export default {
                 var path = this.name[i];
                 this.option.title.text = path + "分布图"
                 this.option.geo.map = path;
-                this.option.geo.width = '80%';
-                this.option.geo.height = '90%';
+                // this.option.geo.width = '80%';
+                // this.option.geo.height = '90%';
                 this.name.length--;
                 this.getMapName(path);
             }
@@ -276,8 +287,8 @@ export default {
                 this.count = 1;
                 this.option.title.text = "武陵山地区分布图"
                 this.option.geo.map = '武陵山';
-                this.option.geo.width = '100%';
-                this.option.geo.height = '100%';
+                // this.option.geo.width = '100%';
+                // this.option.geo.height = '100%';
                 this.getMapName('武陵山')
             
                 Object.assign(this.option.series[0], {

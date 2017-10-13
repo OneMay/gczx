@@ -220,7 +220,7 @@ export default {
                    
                    //this.$store.dispatch('change',data)
                    //console.log(this.$store.getters.getData);
-                  window.open('http://localhost:8088/environment?'+data.baseNo+'&'+data.baseName);
+                  window.open('/environment?'+data.baseNo+'&'+data.baseName);
         },
         setToGeo(){
              this.msg.show='geo';
@@ -308,7 +308,7 @@ export default {
     width: 368px;
     position: relative;
     height: 500px;
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
 }
 
 .box .card {
@@ -334,7 +334,7 @@ export default {
     padding: 6px 0;
 }
 .search-item:hover {
-    background-color: #f6f6f6;
+    background-color: #eae3e3;
     cursor: pointer;
 }
 .mb_5 {
