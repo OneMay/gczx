@@ -1,5 +1,5 @@
 ﻿<template>
-    <div>
+    <div class='center'  :style="{height:height+'px'}">
         <div class="clearfix" :style="{width:'1203px'}">
             <div class="environment">
                 <div class="charts">
@@ -82,7 +82,7 @@ export default {
     name: 'database',
     data() {
         return {
-            height: 300,
+            height: window.innerHeight,
             Url: './../../static/axios/dataImg.json',
             width: document.body.clientWidth - 18,
             setDate: '',
@@ -357,7 +357,12 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 /** 可以设置不同的进入和离开动画 */
-
+.center{
+    display: -webkit-flex; /* Safari */
+  display: flex;
+  justify-content:center;
+  align-items:center;
+}
 
 /* 设置持续时间和动画函数 */
 
@@ -415,7 +420,7 @@ button.btn.btn-danger.btn-xs.horizon2 {
     padding:10px;
 }
 .clearfix{
-     position: relative;
+    /* position: relative;
     left: 50%;
     margin-left: -601.5px;
     /*bottom: 30px;*/

@@ -1,15 +1,17 @@
 <template>
     <div id="app">
-        <div id="nav">
-            <button class="md-close btn-sm btn-primary" @click="choseNav(1)">中国地图</button>
-            <button class="md-close btn-sm btn-primary" @click="choseNav(2)">武陵山片区地图</button>
+        <div v-if="databases=='map'">
+            <div id="nav">
+                <button class="md-close btn-sm btn-primary" @click="choseNav(1)">中国地图</button>
+                <button class="md-close btn-sm btn-primary" @click="choseNav(2)">武陵山片区地图</button>
+            </div>
+            <div id="returnGeo">
+                <geo v-on:tellToName="getProductName" v-on:tellToGeo="getToGeo" v-if="show=='geo'" :setName="name"></geo>
+                <bmap  v-on:tellToBmap="getToBmap" v-if="show=='bmap'"></bmap>
+                <wuling v-if="show=='wuling'" v-on:tellToNamel="getProductName" v-on:tellToGeol="getToGeo" :setName="name"></wuling>
+            </div>
         </div>
-        <div id="returnGeo">
-            <geo v-on:tellToName="getProductName" v-on:tellToGeo="getToGeo" v-if="show=='geo'" :setName="name"></geo>
-            <bmap  v-on:tellToBmap="getToBmap" v-if="show=='bmap'"></bmap>
-            <wuling v-if="show=='wuling'" v-on:tellToNamel="getProductName" v-on:tellToGeol="getToGeo" :setName="name"></wuling>
-        </div>
-
+        <div v-if="databases=='database'"><database></database></div>
 <router-view></router-view>
     </div>
 </template>
@@ -17,9 +19,9 @@
 <script>
 import geo from './components/geo'
 import bmap from './components/bmap'
+import database from './components/database'
 import wuling from './components/wuling'
 import './../static/css/lib/bootstrap.css'
-import 'babel-polyfill'
 // import './../static/css/lib/component.css'
 //import './../../static/js/lib/modalEffects.js'
 import AXIOS from './axios/axios'
@@ -31,6 +33,7 @@ export default {
             width: '100%',
             productName:'',
             show:'geo',
+            databases:'map',
             name:{
                 name:'',
                 map:[],
@@ -140,7 +143,10 @@ export default {
         getPosition(){
             if(window.location.pathname=="/environment"){
                 this.show='environment';
+                this.databases='database'
                 document.getElementById('nav').style.display="none";
+            }else{
+                this.databases='map';
             }
         }
     },
@@ -152,7 +158,8 @@ export default {
     components: {
         geo,
         bmap,
-        wuling
+        wuling,
+        database
     }
 
 }
