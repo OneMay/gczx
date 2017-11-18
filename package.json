@@ -5,7 +5,7 @@
     "author": "",
     "private": true,
     "scripts": {
-        "dev": "node --max_old_space_size=2010 build/dev-server.js",
+        "dev": "node --max_old_space_size=2010 build/dev-server.js --progress --display-modules --display-reasons --colors --watch",
         "start": "node build/dev-server.js",
         "build": "node --max_old_space_size=2000 build/build.js"
     },

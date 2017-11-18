@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import echarts from 'echarts'
-import './../../static/map/wulingshan/wulingshan.js'
+// import echarts from 'echarts'
+// import './../../static/map/wulingshan/wulingshan.js'
 // import './../../static/js/page/index.js'
 import AXIOS from './../axios/axios'
 const Axios = new AXIOS();
@@ -168,11 +168,11 @@ export default {
            // console.log(paramName);
            // console.log(that.echartData[0].name);
             if(this.count>=1&&paramName.indexOf(param.name)<0){
-                    var geopath=`./../../static/map/js/${ param.name}.js`;
-                    if(require(`./../../static/map/js/${ param.name}.js`)){
-                       // console.log(geopath);
-                    　　require(`./../../static/map/js/${ param.name}.js`);
-                    }        
+                    // var geopath=`./../../static/map/js/${ param.name}.js`;
+                    // if(require(`./../../static/map/js/${ param.name}.js`)){
+                    //    // console.log(geopath);
+                    // 　　require(`./../../static/map/js/${ param.name}.js`);
+                    // }        
                 }
             if (this.option.geo.map&&this.option.geo.map!=param.name&&paramName.indexOf(param.name)<0) {
                 ++this.count;
@@ -339,6 +339,13 @@ export default {
            var that = this;
            var mapNameObj=echarts.getMap(name).geoJson.features;
            mapNameObj.forEach(function(val,index){
+               if(that.count>=1){
+                    var head= document.getElementsByTagName('head')[0]; 
+                    var script= document.createElement('script'); 
+                    script.type= 'text/javascript'; 
+                    script.src= `/static/map/js/${val.properties.name}.js`; 
+                    head.appendChild(script); 
+                }
                that.mapName.push(val.properties.name)
            })
            this.setMapColor(this.mapColor); 
