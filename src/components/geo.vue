@@ -151,19 +151,8 @@ export default {
         },
         chartClick(param) {
             this.myChart.setOption(this.option, true);
-            
-            //this.myChart.showLoading();
             var count;
             var that=this;
-            //alert(++this.count);
-             
-            //防止地图继续下钻，若需要继续下钻可以注释掉，敲黑板，此处是同一个元素，不是冒泡，
-            // 
-            /*if (this.count >= 3) {
-                if (this.cityList.indexOf(param.name) == -1) {
-                    return
-                }
-            }*/
              var paramName=[];
             this.echartData.forEach((val,index)=>{
                 paramName.push(val.name)
@@ -171,30 +160,15 @@ export default {
             if (param.name== '南海诸岛') {
                     return ;
                 }
-
-            if(this.count>=2&&paramName.indexOf(param.name)<0){
-                    
-                    // var geopath=`./../../static/map/js/${ param.name}.js`;
-                    // if(require(`./../../static/map/js/${ param.name}.js`)){
-                    //    // console.log(geopath);
-                    // 　　require(`./../../static/map/js/${ param.name}.js`);
-                    // }        
-                }
-            //alert(param.name);
             if (this.option.geo.map&&this.option.geo.map!=param.name&&paramName.indexOf(param.name)<0) {
-                ++this.count;
-                //alert(this.count);
-                
+                ++this.count;              
                 this.name.push(this.option.geo.map);
                 
             }
             count=this.count+1;
             if (count >4) {
-                //alert(count);
                 if (paramName.indexOf(param.name)>=0) {
-                     this.getName=param.name;
-                   // this.$emit('tellToNamel',this.getName);
-                   // $('#click')[0].click();
+                   this.getName=param.name;
                    var data={}
                    var paramName=param.name.toString();
 
@@ -204,9 +178,6 @@ export default {
                      data.companyNo=2;
                     data.baseName=this.placeList[num].baseName
                    }
-
-                   //this.$store.dispatch('change',data)
-                   //console.log(this.$store.getters.getData);
                   window.open('/environment?'+data.baseNo+'&'+data.baseName);
                     return
                 }
@@ -218,7 +189,6 @@ export default {
                         this.msg.arr=this.name;
                         this.msg.from='geo';
                         this.msg.mapColor=this.mapColor;
-                        //alert(param.name)
                        this.$emit('tellToGeo',this.msg); 
                     }
                 }
@@ -232,9 +202,6 @@ export default {
             this.myChart.showLoading();
             this.option.title.text = param.name + "分布图"
             this.option.geo.map = param.name;
-            // this.option.geo.width = '80%';
-            // this.option.geo.height = '90%';
-            //this.getMapName(param.name);
             var NoteData=[];
             this.placeList.forEach(function(val,index){
                 if(param.name==val.Note){
@@ -308,7 +275,6 @@ export default {
                 })
             }
             this.myChart.hideLoading();
-            // this.option.series[0].data.push({tooltip:{formatter:'{b}'}})
             this.myChart.setOption(this.option, true);
         },
         returnClick() {
@@ -317,15 +283,11 @@ export default {
             this.count--;
             this.num=1;
             var that=this;
-            //alert(5);
-            //alert(this.name.length);
             if (this.name.length > 0 ) {
                 var i = this.name.length - 1;
                 var path = this.name[i];
                 this.option.title.text = path + "分布图"
                 this.option.geo.map = path;
-                // this.option.geo.width = '80%';
-                // this.option.geo.height = '90%';
                 this.name.length--;
                 this.getMapName(path);
             }
@@ -334,8 +296,6 @@ export default {
                 this.count = 1;
                 this.option.title.text = "全国分布图"
                 this.option.geo.map = 'china';
-                // this.option.geo.width = '100%';
-                // this.option.geo.height = '100%';
                 this.getMapName('china')
                 Object.assign(this.option.series[0], {
                     data: [{
@@ -459,7 +419,6 @@ export default {
             if(num==1){
                 this.option.geo.itemStyle.normal.areaColor='rgba(0,0,0,0.3)';
                 this.mapName.forEach(function(val,index){
-                //console.log(val)
                 if(val=="湖北"||val=="恩施土家族苗族自治州"){
                   that.option.geo.regions.push({
                        name:val,
@@ -638,17 +597,10 @@ export default {
             this.myChart = echarts.init(document.getElementById(id));
             this.myChart.showLoading();
             
-            //this.myChart.setOption(this.option);
             this.myChart.on("dblclick", this.chartClick);
             var node = document.getElementById('returnGeo');
             var node2 = document.getElementById('echarts');
             var that = this;
-        //     node.removeEventListener("dblclick",function(){
-        //     //that.returnClick();
-        // })
-        //     node2.addEventListener("dblclick", function () {
-        //         that.returnClick();
-        //     });
 
             if(this.setName.name){
                 this.mapColor=this.setName.mapColor;     
@@ -697,11 +649,9 @@ export default {
                     })
                     that.placeListArr.push(val.baseName);
                 })
-                //alert( that.placeList)
                 if(document.getElementById('mecharts')){
                     that.drawGraph('mecharts');
                 }
-                //console.log(that.placeList)
             })
             .catch(err=>{
                 console.log(err)

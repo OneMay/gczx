@@ -12,15 +12,15 @@
                             <li data-index="1"  class="search-item cater-item" v-for="item in items" :coordinate="item.baseName+':'+'['+item.longitudePosition+','+item.latitudePosition+']'" @click="toCoordinate(item.longitudePosition , item.latitudePosition)">
                                 <div class="cf mb_5">
                                     <div class="col-r">
-                                        <div class="img-wrap">
-                                            <a href="javascript:void(0)" data-index="1"  >
+                                        <!-- <div class="img-wrap">
+                <                            a href="javascript:void(0)" data-index="1"  >
                                                 <img src="./../../static/img/shebei.jpg" style="width:71px;height:58px;"> </a>
-                                        </div>
+                                        </div> -->
                                     </div>
-                                    <div class="ml_30 mr_85">
-                                        <div class="row">
+                                    <div>
+                                        <div >
                                             <span>
-                                                <a href="javascript:void(0)" class="n-blue" data-index="1" v-text="item.baseName"></a>
+                                                <a class="n-blue" data-index="1" v-text="item.baseName"></a>
                                             </span>
                                             <span class="n-grey addr" title=""></span>
                                         </div>
@@ -305,7 +305,7 @@ export default {
 }
 
 .box {
-    width: 368px;
+    width: 180px;
     position: relative;
     height: 500px;
     /* overflow-y: scroll; */

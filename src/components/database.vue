@@ -46,7 +46,7 @@
                                 <button type="button" class="btn btn-danger btn-xs" @click="setDay(7)">最近7天</button>
                                 <button type="button" class="btn btn-danger btn-xs" @click="setDay(30)">最近30天</button>
                             </div>
-                            <transition name="bounce" mode="out-in">
+                         
                                 <temperature v-if="show=='temperature'" key="temperature" :getenvir="envirDate"></temperature>
                                 <humidity v-if="show=='humidity'" key="humidity" :getenvir="envirDate"></humidity>
                                 <rain v-if="show=='rain'" key="rain" :getenvir="envirDate"></rain>
@@ -55,7 +55,7 @@
                                 <PM v-if="show=='PM'" key="PM" :getenvir="envirDate"></PM>
                                 <beam v-if="show=='beam'" key="beam" :getenvir="envirDate"></beam>
                                 <pressure v-if="show=='pressure'" key="pressure" :getenvir="envirDate"></pressure>
-                            </transition>
+                           
                         </div>
                     </div>
                 </div>
